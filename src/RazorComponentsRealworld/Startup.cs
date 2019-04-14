@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Ganss.XSS;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -23,7 +25,17 @@ namespace RazorComponentsRealworld
 
             services.AddRazorComponents();
 
-            //services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
+            {
+                var sanitizer = new HtmlSanitizer();
+                sanitizer.AllowedAttributes.Add("class");
+                return sanitizer;
+            });
+            //services.AddScoped<IUriHelper, UriHelperBase>();
+            services.AddTransient<System.Net.Http.HttpClient>();
+            services.AddSingleton<AppState>();
+            services.AddSingleton<ApiClient>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
