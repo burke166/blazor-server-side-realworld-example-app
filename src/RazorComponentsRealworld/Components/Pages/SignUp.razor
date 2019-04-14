@@ -1,5 +1,6 @@
 ﻿@page "/signup"
-@using BlazorRealworld.Model
+@using Microsoft.AspNetCore.Components.Services
+@using RazorComponentsRealworld.Model
 @inject ApiClient api
 @inject IUriHelper uriHelper
 
@@ -14,13 +15,13 @@
                 <ErrorMessages Errors=@response.errors />
                 <form>
                     <fieldset class="form-group">
-                        <input class="form-control form-control-lg" type="text" placeholder="Your Name" bind="@userModel.username"/>
+                        <input class="form-control form-control-lg" type="text" placeholder="Your Name" bind="@userModel.username" />
                     </fieldset>
                     <fieldset class="form-group">
-                        <input class="form-control form-control-lg" type="email" placeholder="Email" bind="@userModel.email"/>
+                        <input class="form-control form-control-lg" type="email" placeholder="Email" bind="@userModel.email" />
                     </fieldset>
                     <fieldset class="form-group">
-                        <input class="form-control form-control-lg" type="password" placeholder="Password" bind="@userModel.password"/>
+                        <input class="form-control form-control-lg" type="password" placeholder="Password" bind="@userModel.password" />
                     </fieldset>
                     <button class="btn btn-lg btn-primary pull-xs-right" type="submit" onclick="@Submit">
                         Sign up

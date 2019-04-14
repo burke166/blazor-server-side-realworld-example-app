@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BlazorRealworld.Model
+namespace RazorComponentsRealworld.Model
 {
     public class UserModel
     {

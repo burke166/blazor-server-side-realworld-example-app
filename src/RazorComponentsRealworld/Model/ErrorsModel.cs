@@ -1,4 +1,4 @@
-﻿namespace BlazorRealworld
+﻿namespace RazorComponentsRealworld.Model
 {
     public class ErrorsModel
     {

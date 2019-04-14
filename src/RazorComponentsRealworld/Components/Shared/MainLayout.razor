@@ -1,8 +1,9 @@
-﻿@using System
-@inherits BlazorLayoutComponent
+﻿@using Microsoft.AspNetCore.Components.Services
+@inherits LayoutComponentBase
 @inject AppState state
 @inject ApiClient api
 @inject IUriHelper uriHelper
+@inject IJSRuntime jsRuntime
 
 <nav class="navbar navbar-light">
     <div class="container">
@@ -69,11 +70,11 @@
 </footer>
 
 @functions {
-    void SignOut()
+    async void SignOut()
     {
         api.ClearToken();
         state.UpdateUser(null);
-        RegisteredFunction.Invoke<bool>("deleteStoredToken");
+        await jsRuntime.InvokeAsync<bool>("Realworld.deleteStoredToken");
         uriHelper.NavigateTo("/");
     }
 }

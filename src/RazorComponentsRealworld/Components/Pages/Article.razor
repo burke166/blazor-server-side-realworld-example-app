@@ -1,5 +1,6 @@
 ﻿@page "/article/{Slug}"
-@using BlazorRealworld.Model
+@using Microsoft.AspNetCore.Components.Services
+@using RazorComponentsRealworld.Model
 @inject ApiClient api
 @inject AppState state
 @inject IUriHelper uriHelper
@@ -55,6 +56,7 @@
 
         <div class="row article-content">
             <div id="article-body" class="col-md-12">
+                <MarkdownView Content="@article.body" />
             </div>
         </div>
 
@@ -149,12 +151,6 @@
     {
         article = await api.GetArticleAsync(Slug);
         StateHasChanged();
-
-        var articleBody = CommonMark.CommonMarkConverter.Convert(article.body);
-
-        // Until raw HTML is supported in Blazor:
-        // https://github.com/aspnet/Blazor/issues/167
-        RegisteredFunction.Invoke<bool>("showRawHtml", "article-body", articleBody);
     }
 
     async Task DeleteArticle()
