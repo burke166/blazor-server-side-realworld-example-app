@@ -1,5 +1,111 @@
 ﻿@page "/"
+@using BlazorRealworld.Model
+@inject ApiClient api
+@inject AppState state
 
-<h1>Hello, world!</h1>
+<div class="home-page">
+    @if (!state.IsSignedIn)
+    {
+        <div class="banner">
+            <div class="container">
+                <h1 class="logo-font">conduit</h1>
+                <p>A place to share your knowledge.</p>
+            </div>
+        </div>
+    }
+    <div class="container page">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="feed-toggle">
+                    <ul class="nav nav-pills outline-active">
+                        <li class="nav-item">
+                            <a href="" class="@($"nav-link {FeedState}")" onclick="@YourFeedAsync">Your Feed</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="@($"nav-link {GlobalState}")" onclick="@GlobalFeedAsync">Global Feed</a>
+                        </li>
+                        @if (selectedTab == SelectedTab.Tag)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link active"><i class="ion-pound"></i> @selectedTag</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <ArticleList Articles=@articles />
+            </div>
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <p>Popular Tags</p>
+                    <div class="tag-list">
+                        @if (tags == null)
+                        {
+                            <text>Loading tags...</text>
+                        }
+                        else
+                        {
+                            foreach (var tag in tags)
+                            {
+                                <a href="" class="tag-pill tag-default" onclick="@(() => SelectTag(tag))">@tag</a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+@functions {
+    IEnumerable<ArticleModel> articles;
+    IEnumerable<string> tags;
+    SelectedTab selectedTab;
+    string selectedTag;
+
+    string FeedState
+    {
+        get
+        {
+            if (!state.IsSignedIn) return "disabled";
+            if (selectedTab == SelectedTab.Feed) return "active";
+            return "";
+        }
+    }
+
+    string GlobalState => selectedTab == SelectedTab.Global ? "active" : "";
+
+    protected override async Task OnInitAsync()
+    {
+        await GlobalFeedAsync();
+        tags = await api.GetTagsAsync();
+    }
+
+    async Task YourFeedAsync()
+    {
+        selectedTab = SelectedTab.Feed;
+        articles = await api.GetArticleFeedAsync();
+        StateHasChanged();
+    }
+
+    async Task GlobalFeedAsync()
+    {
+        selectedTab = SelectedTab.Global;
+        articles = await api.GetArticlesAsync();
+        StateHasChanged();
+    }
+
+    async Task SelectTag(string tag)
+    {
+        selectedTab = SelectedTab.Tag;
+        selectedTag = tag;
+        articles = await api.GetArticlesByTagAsync(tag);
+        StateHasChanged();
+    }
+
+    enum SelectedTab
+    {
+        Feed,
+        Global,
+        Tag
+    }
+}

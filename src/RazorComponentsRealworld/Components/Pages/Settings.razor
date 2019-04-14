@@ -1,0 +1,77 @@
+﻿@page "/settings"
+@implements IDisposable
+@using System
+@using BlazorRealworld
+@using BlazorRealworld.Model
+@inject AppState state
+@inject ApiClient api
+@inject IUriHelper uriHelper
+
+<div class="settings-page">
+    <div class="container page">
+        <div class="row">
+            <div class="col-md-6 offset-md-3 col-xs-12">
+                <h1 class="text-xs-center">Your Settings</h1>
+                <ErrorMessages Errors=@response.errors />
+                <form>
+                    <fieldset>
+                        <fieldset class="form-group">
+                            <input class="form-control" type="text" placeholder="URL of profile picture" bind="@(userModel.image)"/>
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <input class="form-control form-control-lg" type="text" placeholder="Your Name" bind="@(userModel.username)"/>
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you" bind="@(userModel.bio)">@userModel.bio</textarea>
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <input class="form-control form-control-lg" type="email" placeholder="Email" bind="@(userModel.email)" />
+                        </fieldset>
+                        <fieldset class="form-group">
+                            <input class="form-control form-control-lg" type="password" placeholder="Password" bind="@(userModel.password)"/>
+                        </fieldset>
+                        <button class="btn btn-lg btn-primary pull-xs-right" onclick="@Submit">
+                            Update Settings
+                        </button>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions
+{
+    UserModel userModel = new UserModel();
+    UserResponse response = new UserResponse();
+
+    protected override void OnInit()
+    {
+        state.OnUserChange += UserHasLoaded;
+    }
+
+    public void Dispose()
+    {
+        state.OnUserChange -= UserHasLoaded;
+    }
+
+    void UserHasLoaded()
+    {
+        userModel = state.User.Clone();
+        StateHasChanged();
+    }
+
+    async Task Submit()
+    {
+        response = await api.UpdateUserAsync(userModel);
+
+        if (response.user != null)
+        {
+            state.UpdateUser(response.user);
+            uriHelper.NavigateTo("/");
+        }
+        else
+            // Show errors
+            StateHasChanged();
+    }
+}
