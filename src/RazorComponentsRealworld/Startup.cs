@@ -35,7 +35,6 @@ namespace RazorComponentsRealworld
             services.AddTransient<System.Net.Http.HttpClient>();
             services.AddSingleton<AppState>();
             services.AddSingleton<ApiClient>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

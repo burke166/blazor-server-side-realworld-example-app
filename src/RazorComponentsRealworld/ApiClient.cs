@@ -122,10 +122,10 @@ namespace RazorComponentsRealworld
                 article = article
             };
 
-            if (String.IsNullOrEmpty(article.slug))
+            if (String.IsNullOrEmpty(article.Slug))
                 return await _httpClient.PostJsonAsync<ArticleResponse>(url, content);
             else
-                return await _httpClient.PutJsonAsync<ArticleResponse>($"{url}/{article.slug}", content);
+                return await _httpClient.PutJsonAsync<ArticleResponse>($"{url}/{article.Slug}", content);
         }
 
         public async Task<bool> DeleteArticleAsync(string slug)

@@ -11,15 +11,15 @@
 
     <div class="banner">
         <div class="container">
-            <h1>@article.title</h1>
+            <h1>@article.Title</h1>
 
             <div class="article-meta">
-                <a href=""><img src="@article.author.image" /></a>
+                <a href=""><img src="@article.Author.Image" /></a>
                 <div class="info">
-                    <a href="" class="author">@article.author.username</a>
+                    <a href="" class="author">@article.Author.Username</a>
                     <span class="date">January 20th</span>
                 </div>
-                @if (article.author.username == state.User.username)
+                @if (article.Author.Username == state.User.username)
                 {
                     <a class="btn btn-outline-secondary btn-sm" href="/editor/@Slug">
                         <i class="ion-edit"></i>
@@ -38,13 +38,13 @@
                     <button class="btn btn-sm btn-outline-secondary">
                         <i class="ion-plus-round"></i>
                         &nbsp;
-                        Follow @article.author.username <span class="counter">(10)</span>
+                        Follow @article.Author.Username <span class="counter">(10)</span>
                     </button>
                     <text>&nbsp; &nbsp;</text>
                     <button class="btn btn-sm btn-outline-primary">
                         <i class="ion-heart"></i>
                         &nbsp;
-                        Favorite Post <span class="counter">(@article.favoritesCount)</span>
+                        Favorite Post <span class="counter">(@article.FavoritesCount)</span>
                     </button>
                 }
             </div>
@@ -56,7 +56,7 @@
 
         <div class="row article-content">
             <div id="article-body" class="col-md-12">
-                <MarkdownView Content="@article.body" />
+                <MarkdownView Content="@article.Body" />
             </div>
         </div>
 
@@ -64,7 +64,7 @@
 
         <div class="article-actions">
             <div class="article-meta">
-                <a href="profile.html"><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
+                <a href="profile.html"><img src="//i.imgur.com/Qr71crq.jpg" /></a>
                 <div class="info">
                     <a href="" class="author">Eric Simons</a>
                     <span class="date">January 20th</span>
@@ -93,7 +93,7 @@
                         <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
                     </div>
                     <div class="card-footer">
-                        <img src="http://i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
+                        <img src="//i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
                         <button class="btn btn-sm btn-primary">
                             Post Comment
                         </button>
@@ -106,7 +106,7 @@
                     </div>
                     <div class="card-footer">
                         <a href="" class="comment-author">
-                            <img src="http://i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
+                            <img src="//i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
                         </a>
                         &nbsp;
                         <a href="" class="comment-author">Jacob Schmidt</a>
@@ -120,7 +120,7 @@
                     </div>
                     <div class="card-footer">
                         <a href="" class="comment-author">
-                            <img src="http://i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
+                            <img src="//i.imgur.com/Qr71crq.jpg" class="comment-author-img" />
                         </a>
                         &nbsp;
                         <a href="" class="comment-author">Jacob Schmidt</a>
@@ -143,10 +143,11 @@
 
 @functions
 {
+    [Parameter]
     public string Slug { get; set; }
 
     ArticleModel article = null;
-
+    
     protected override async Task OnInitAsync()
     {
         article = await api.GetArticleAsync(Slug);

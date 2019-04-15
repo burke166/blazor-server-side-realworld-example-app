@@ -16,13 +16,13 @@
                     <form>
                         <fieldset>
                             <fieldset class="form-group">
-                                <input type="text" class="form-control form-control-lg" placeholder="Article Title" bind="@articleModel.title" />
+                                <input type="text" class="form-control form-control-lg" placeholder="Article Title" bind="@articleModel.Title" />
                             </fieldset>
                             <fieldset class="form-group">
-                                <input type="text" class="form-control" placeholder="What's this article about?" bind="@articleModel.description" />
+                                <input type="text" class="form-control" placeholder="What's this article about?" bind="@articleModel.Description" />
                             </fieldset>
                             <fieldset class="form-group">
-                                <textarea class="form-control" rows="8" placeholder="Write your article (in markdown)" bind="@articleModel.body">@articleModel.body</textarea>
+                                <textarea class="form-control" rows="8" placeholder="Write your article (in markdown)" bind="@articleModel.Body">@articleModel.Body</textarea>
                             </fieldset>
                             <fieldset class="form-group">
                                 <input type="text" class="form-control" placeholder="Enter tags" bind="@tagString" /><div class="tag-list"></div>
@@ -41,6 +41,7 @@
 
 @functions
 {
+    [Parameter]
     public string Slug { get; set; }
 
     ArticleModel articleModel = null;
@@ -61,13 +62,13 @@
 
     async Task Submit()
     {
-        articleModel.tagList = tagString.Split(' ');
+        articleModel.TagList = tagString.Split(' ');
         response = await api.SaveArticleAsync(articleModel);
         var postedArticle = response?.article;
 
         if (postedArticle != null)
         {
-            uriHelper.NavigateTo($"/article/{postedArticle.slug}");
+            uriHelper.NavigateTo($"/article/{postedArticle.Slug}");
         }
         else
             // Show errors

@@ -1,62 +1,6 @@
-﻿@using Microsoft.AspNetCore.Components.Services
-@inherits LayoutComponentBase
-@inject AppState state
-@inject ApiClient api
-@inject IUriHelper uriHelper
-@inject IJSRuntime jsRuntime
+﻿@inherits LayoutComponentBase
 
-<nav class="navbar navbar-light">
-    <div class="container">
-        <NavLink class="navbar-brand" href="/" Match=NavLinkMatch.All>conduit</NavLink>
-        <ul class="nav navbar-nav pull-xs-right">
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/" Match=NavLinkMatch.All>
-                    Home
-                </NavLink>
-            </li>
-            @if (state.IsSignedIn)
-            {
-                var username = state.User?.username;
-                var image = state.User?.image;
-
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/editor">
-                        <i class="ion-compose"></i>&nbsp;New Post
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/settings">
-                        <i class="ion-gear-a"></i>&nbsp;Settings
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href=@("/profile/" + username)>
-                        <img src="@image" class="user-pic" />
-                        @username
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/" onclick="@(SignOut)">
-                        Sign out
-                    </a>
-                </li>
-            }
-            else
-            {
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/signin">
-                        Sign in
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/signup">
-                        Sign up
-                    </NavLink>
-                </li>
-            }
-        </ul>
-    </div>
-</nav>
+<NavMenu />
 
 @Body
 
@@ -68,13 +12,3 @@
         </span>
     </div>
 </footer>
-
-@functions {
-    async void SignOut()
-    {
-        api.ClearToken();
-        state.UpdateUser(null);
-        await jsRuntime.InvokeAsync<bool>("Realworld.deleteStoredToken");
-        uriHelper.NavigateTo("/");
-    }
-}
