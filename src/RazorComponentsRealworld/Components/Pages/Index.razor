@@ -4,6 +4,7 @@
 @inject ApiClient api
 @inject AppState state
 @inject ArticlesService articlesApi
+@inject TagsService tagsApi
 
 <div class="home-page">
     @if (!state.IsSignedIn)
@@ -79,7 +80,7 @@
     protected override async Task OnInitAsync()
     {
         await GlobalFeedAsync();
-        tags = await api.GetTagsAsync();
+        tags = await tagsApi.GetAllAsync();
     }
 
     async Task YourFeedAsync()
@@ -92,7 +93,7 @@
     async Task GlobalFeedAsync()
     {
         selectedTab = SelectedTab.Global;
-        articles = await articlesApi.QueryAsync();
+        articles = await articlesApi.GetAllAsync();
         StateHasChanged();
     }
 

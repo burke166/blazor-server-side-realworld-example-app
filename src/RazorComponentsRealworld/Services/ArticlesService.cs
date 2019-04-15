@@ -20,9 +20,15 @@ namespace RazorComponentsRealworld.Services
             return articles.Articles;
         }
 
+        public async Task<IEnumerable<ArticleModel>> GetAllAsync()
+        {
+            return await QueryAsync();
+        }
+
         public async Task<ArticleModel> GetAsync(string Slug)
         {
-            return await api.GetAsync<ArticleModel>($"/articles/{Slug}");
+            ArticleResponse article = await api.GetAsync<ArticleResponse>($"/articles/{Slug}");
+            return article.Article;
         }
 
         public async Task<HttpResponseMessage> DeleteAsync(string Slug)
@@ -56,5 +62,10 @@ namespace RazorComponentsRealworld.Services
     internal class ArticlesResponse
     {
         public ArticleModel[] Articles { get; set; }
+    }
+
+    internal class ArticleResponse
+    {
+        public ArticleModel Article { get; set; }
     }
 }

@@ -31,10 +31,13 @@ namespace RazorComponentsRealworld
                 sanitizer.AllowedAttributes.Add("class");
                 return sanitizer;
             });
-            //services.AddScoped<IUriHelper, UriHelperBase>();
+
             services.AddTransient<System.Net.Http.HttpClient>();
             services.AddTransient<Services.IApiService, Services.ApiService>();
             services.AddTransient<Services.ArticlesService>();
+            services.AddTransient<Services.CommentsService>();
+            services.AddTransient<Services.TagsService>();
+
             services.AddSingleton<AppState>();
             services.AddSingleton<ApiClient>();
         }
