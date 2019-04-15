@@ -33,6 +33,8 @@ namespace RazorComponentsRealworld
             });
             //services.AddScoped<IUriHelper, UriHelperBase>();
             services.AddTransient<System.Net.Http.HttpClient>();
+            services.AddTransient<Services.IApiService, Services.ApiService>();
+            services.AddTransient<Services.ArticlesService>();
             services.AddSingleton<AppState>();
             services.AddSingleton<ApiClient>();
         }

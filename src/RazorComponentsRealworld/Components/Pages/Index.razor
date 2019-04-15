@@ -1,7 +1,9 @@
 ﻿@page "/"
 @using RazorComponentsRealworld.Model
+@using RazorComponentsRealworld.Services;
 @inject ApiClient api
 @inject AppState state
+@inject ArticlesService articlesApi
 
 <div class="home-page">
     @if (!state.IsSignedIn)
@@ -90,7 +92,7 @@
     async Task GlobalFeedAsync()
     {
         selectedTab = SelectedTab.Global;
-        articles = await api.GetArticlesAsync();
+        articles = await articlesApi.QueryAsync();
         StateHasChanged();
     }
 

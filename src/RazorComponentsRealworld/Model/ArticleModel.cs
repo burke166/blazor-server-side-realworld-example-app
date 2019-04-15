@@ -27,8 +27,22 @@ namespace RazorComponentsRealworld.Model
         public string Image {
             get
             {
-                Uri uri = new Uri(image);
-                return "//" + uri.Host + uri.PathAndQuery;
+                if (string.IsNullOrWhiteSpace(image)) return string.Empty;
+
+                Uri uri;
+
+                if (Uri.TryCreate(image, UriKind.Absolute, out uri))
+                    return "//" + uri.Host + uri.PathAndQuery;
+                else if (Uri.TryCreate(image, UriKind.Relative, out uri))
+                {
+                    string result = uri.OriginalString;
+                    if (result.Substring(0, 1) == "/")
+                        return result;
+                    else
+                        return "//" + result;
+                }
+                else
+                    return string.Empty;
             }
             set
             {
