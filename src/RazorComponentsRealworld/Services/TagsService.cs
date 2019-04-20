@@ -14,8 +14,8 @@ namespace RazorComponentsRealworld.Services
 
         public async Task<IEnumerable<string>> QueryAsync(IDictionary<string, string> Params = null)
         {
-            TagResponse tags = await api.GetAsync<TagResponse>($"/tags/", Params);
-            return tags.Tags;
+            var response = await api.GetAsync<TagResponse>($"/tags/", Params);
+            return response?.Value?.Tags;
         }
 
         public async Task<IEnumerable<string>> GetAllAsync()

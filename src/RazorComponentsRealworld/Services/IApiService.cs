@@ -10,9 +10,11 @@ namespace RazorComponentsRealworld.Services
     {
         void SetToken(string Token);
         void ClearToken();
-        Task<T> GetAsync<T>(string Path, IDictionary<string, string> Params = null);
-        Task<T> PutAsync<T>(T Value, string Path, IDictionary<string, string> Params = null);
-        Task<T> PostAsync<T>(T Value, string Path, IDictionary<string, string> Params = null);
-        Task<HttpResponseMessage> DeleteAsync(string Path, IDictionary<string, string> Params = null);
+        Task<ApiResponse<T>> GetAsync<T>(string Path, IDictionary<string, string> Params = null);
+        Task<ApiResponse<T>> PutAsync<T>(string Path, IDictionary<string, string> Params, object Value);
+        Task<ApiResponse<T>> PutAsync<T>(string Path, object Value);
+        Task<ApiResponse<T>> PostAsync<T>(string Path, IDictionary<string, string> Params, object Value);
+        Task<ApiResponse<T>> PostAsync<T>(string Path, object Value);
+        Task<ApiResponse<T>> DeleteAsync<T>(string Path, IDictionary<string, string> Params = null);
     }
 }

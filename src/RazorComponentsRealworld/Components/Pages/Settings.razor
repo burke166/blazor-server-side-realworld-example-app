@@ -17,19 +17,19 @@
                 <form>
                     <fieldset>
                         <fieldset class="form-group">
-                            <input class="form-control" type="text" placeholder="URL of profile picture" bind="@(userModel.image)" />
+                            <input class="form-control" type="text" placeholder="URL of profile picture" bind="@(userModel.Image)" />
                         </fieldset>
                         <fieldset class="form-group">
-                            <input class="form-control form-control-lg" type="text" placeholder="Your Name" bind="@(userModel.username)" />
+                            <input class="form-control form-control-lg" type="text" placeholder="Your Name" bind="@(userModel.Username)" />
                         </fieldset>
                         <fieldset class="form-group">
-                            <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you" bind="@(userModel.bio)">@userModel.bio</textarea>
+                            <textarea class="form-control form-control-lg" rows="8" placeholder="Short bio about you" bind="@(userModel.Bio)">@userModel.Bio</textarea>
                         </fieldset>
                         <fieldset class="form-group">
-                            <input class="form-control form-control-lg" type="email" placeholder="Email" bind="@(userModel.email)" />
+                            <input class="form-control form-control-lg" type="email" placeholder="Email" bind="@(userModel.Email)" />
                         </fieldset>
                         <fieldset class="form-group">
-                            <input class="form-control form-control-lg" type="password" placeholder="Password" bind="@(userModel.password)" />
+                            <input class="form-control form-control-lg" type="password" placeholder="Password" bind="@(userCredentials.Password)" />
                         </fieldset>
                         <button class="btn btn-lg btn-primary pull-xs-right" onclick="@Submit">
                             Update Settings
@@ -44,6 +44,7 @@
 @functions
 {
     UserModel userModel = new UserModel();
+    UserCredentials userCredentials = new UserCredentials();
     UserResponse response = new UserResponse();
 
     protected override void OnInit()

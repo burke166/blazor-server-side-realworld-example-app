@@ -21,7 +21,7 @@
                     <a href="" class="author">@article.Author.Username</a>
                     <span class="date">@article.CreatedAt.ToLongDateString()</span>
                 </div>
-                @if (article.Author.Username == state.User.username)
+                @if (article.Author.Username == state.User.Username)
                 {
                     <a class="btn btn-outline-secondary btn-sm" href="/editor/@Slug">
                         <i class="ion-edit"></i>
@@ -97,7 +97,7 @@
                             <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
                         </div>
                         <div class="card-footer">
-                            <img src="@state.User.image" class="comment-author-img" />
+                            <img src="@state.User.Image" class="comment-author-img" />
                             <button class="btn btn-sm btn-primary">
                                 Post Comment
                             </button>

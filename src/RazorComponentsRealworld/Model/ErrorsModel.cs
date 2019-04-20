@@ -1,13 +1,18 @@
-﻿namespace RazorComponentsRealworld.Model
+﻿using Newtonsoft.Json;
+
+namespace RazorComponentsRealworld.Model
 {
     public class ErrorsModel
     {
-        public string[] username { get; set; }
-        public string[] email { get; set; }
-        public string[] password { get; set; }
-        public string[] title { get; set; }
-        public string[] body { get; set; }
-        public string[] description { get; set; }
-        public string[] emailOrPassword { get; set; }
+
+        public string[] Username { get; set; }
+        public string[] Email { get; set; }
+        public string[] Password { get; set; }
+        public string[] Title { get; set; }
+        public string[] Body { get; set; }
+        public string[] Description { get; set; }
+
+        [JsonProperty(PropertyName = "email or password")]
+        public string[] EmailOrPassword { get; set; }
     }
 }

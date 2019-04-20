@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
+using Newtonsoft.Json;
+using RazorComponentsRealworld.Model;
 
 namespace RazorComponentsRealworld.Services
 {
@@ -11,10 +12,12 @@ namespace RazorComponentsRealworld.Services
     {
         const string BaseUrl = "https://conduit.productionready.io/api";
         private HttpClient httpClient;
+        private IConsoleLogService console;
 
-        public ApiService(HttpClient _httpClient)
+        public ApiService(HttpClient _httpClient, IConsoleLogService _console)
         {
             httpClient = _httpClient;
+            console = _console;
         }
 
         public void SetToken(string Token)
@@ -27,24 +30,50 @@ namespace RazorComponentsRealworld.Services
             httpClient.DefaultRequestHeaders.Authorization = null;
         }
 
-        public async Task<T> GetAsync<T>(string Path, IDictionary<string, string> Params = null)
+        public async Task<ApiResponse<T>> GetAsync<T>(string Path, IDictionary<string, string> Params = null)
         {
-            return await httpClient.GetJsonAsync<T>(BuildUri(Path, Params));
+            HttpResponseMessage response = await httpClient.GetAsync(BuildUri(Path, Params));
+
+            return await ApiResponse<T>.CreateAsync(response);
         }
 
-        public async Task<T> PutAsync<T>(T Value, string Path, IDictionary<string, string> Params = null)
+        public async Task<ApiResponse<T>> PutAsync<T>(string Path, IDictionary<string, string> Params, object Value)
         {
-            return await httpClient.PutJsonAsync<T>(BuildUri(Path, Params), Value);
+            string valueString = JsonConvert.SerializeObject(Value);
+            StringContent content = new StringContent(valueString, System.Text.Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await httpClient.PutAsync(BuildUri(Path, Params), content);
+
+            return await ApiResponse<T>.CreateAsync(response);
         }
 
-        public async Task<T> PostAsync<T>(T Value, string Path, IDictionary<string, string> Params = null)
+        public async Task<ApiResponse<T>> PutAsync<T>(string Path, object Value)
         {
-            return await httpClient.PostJsonAsync<T>(BuildUri(Path, Params), Value);
+            return await PutAsync<T>(Path, null, Value);
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(string Path, IDictionary<string, string> Params = null)
+        public async Task<ApiResponse<T>> PostAsync<T>(string Path, IDictionary<string, string> Params, object Value)
         {
-            return await httpClient.DeleteAsync(BuildUri(Path, Params));
+            string valueString = JsonConvert.SerializeObject(Value);
+            StringContent content = new StringContent(valueString, System.Text.Encoding.UTF8, "application/json");
+
+            HttpResponseMessage response = await httpClient.PostAsync(BuildUri(Path, Params), content);
+
+            await console.LogAsync(await response.Content.ReadAsStringAsync()); 
+
+            return await ApiResponse<T>.CreateAsync(response);
+        }
+
+        public async Task<ApiResponse<T>> PostAsync<T>(string Path, object Value)
+        {
+            return await PostAsync<T>(Path, null, Value);
+        }
+
+        public async Task<ApiResponse<T>> DeleteAsync<T>(string Path, IDictionary<string, string> Params = null)
+        {
+            HttpResponseMessage response = await httpClient.DeleteAsync(BuildUri(Path, Params));
+
+            return await ApiResponse<T>.CreateAsync(response);
         }
 
         protected string BuildUri(string Path, IDictionary<string, string> Params = null)
@@ -66,4 +95,50 @@ namespace RazorComponentsRealworld.Services
             return result.Uri.AbsoluteUri;
         }
     }
+
+    public class ApiResponse<T>
+    {
+        public T Value { get; set; }
+        public ErrorsModel Errors { get; set; }
+        public System.Net.HttpStatusCode StatusCode { get; set; }
+        public bool HasSuccessStatusCode { get; set; }
+
+        public ApiResponse()
+        {
+
+        }
+        
+        private async Task<ApiResponse<T>> InitalizeAsync(HttpResponseMessage response)
+        {
+            StatusCode = response.StatusCode;
+            HasSuccessStatusCode = response.IsSuccessStatusCode;
+            Errors = new ErrorsModel();
+            Value = default(T);
+            var data = await response.Content.ReadAsStringAsync();
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Value = JsonConvert.DeserializeObject<T>(data);
+            }
+            else
+            {
+                ErrorResponse errors = JsonConvert.DeserializeObject<ErrorResponse>(data);
+                Errors = errors.Errors;
+            }
+
+            return this;
+        }
+
+        public static Task<ApiResponse<T>> CreateAsync(HttpResponseMessage response)
+        {
+            var result = new ApiResponse<T>();
+            return result.InitalizeAsync(response);
+        }
+    }
+
+    internal class ErrorResponse
+    {
+        public ErrorsModel Errors { get; set; }
+    }
+
 }

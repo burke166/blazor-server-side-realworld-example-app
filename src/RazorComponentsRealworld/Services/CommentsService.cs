@@ -16,7 +16,8 @@ namespace RazorComponentsRealworld.Services
 
         public async Task<CommentModel> AddAsync(string Slug, CommentModel Comment)
         {
-            return await api.PostAsync<CommentModel>(Comment, $"/articles/{Slug}/comments");
+            var response = await api.PostAsync<CommentModel>($"/articles/{Slug}/comments", Comment);
+            return response?.Value;
         }
 
         public async Task<CommentModel> AddAsync(ArticleModel Article, CommentModel Comment)
@@ -26,26 +27,27 @@ namespace RazorComponentsRealworld.Services
 
         public async Task<IEnumerable<CommentModel>> GetAllAsync(string Slug)
         {
-            CommentRepsonse comments = await api.GetAsync<CommentRepsonse>($"/articles/{Slug}/comments");
-            return comments.Comments;
+            var response = await api.GetAsync<CommentRepsonse>($"/articles/{Slug}/comments");
+            return response?.Value?.Comments;
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(string Slug, int CommentId)
+        public async Task<bool> DeleteAsync(string Slug, int CommentId)
         {
-            return await api.DeleteAsync($"/articles/{Slug}/comments/{CommentId.ToString()}");
+            var response = await api.DeleteAsync<CommentModel>($"/articles/{Slug}/comments/{CommentId.ToString()}");
+            return response?.HasSuccessStatusCode ?? false;
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(string Slug, CommentModel Comment)
+        public async Task<bool> DeleteAsync(string Slug, CommentModel Comment)
         {
             return await DeleteAsync(Slug, Comment.Id);
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(ArticleModel Article, CommentModel Comment)
+        public async Task<bool> DeleteAsync(ArticleModel Article, CommentModel Comment)
         {
             return await DeleteAsync(Article.Slug, Comment.Id);
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(ArticleModel Article, int CommentId)
+        public async Task<bool> DeleteAsync(ArticleModel Article, int CommentId)
         {
             return await DeleteAsync(Article.Slug, CommentId);
         }

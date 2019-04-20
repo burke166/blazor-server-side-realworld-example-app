@@ -34,9 +34,12 @@ namespace RazorComponentsRealworld
 
             services.AddTransient<System.Net.Http.HttpClient>();
             services.AddTransient<Services.IApiService, Services.ApiService>();
+            services.AddTransient<Services.IJwtService, Services.JwtService>();
+            services.AddTransient<Services.IConsoleLogService, Services.ConsoleLogService>();
             services.AddTransient<Services.ArticlesService>();
             services.AddTransient<Services.CommentsService>();
             services.AddTransient<Services.TagsService>();
+            services.AddTransient<Services.UserService>();
 
             services.AddSingleton<AppState>();
             services.AddSingleton<ApiClient>();

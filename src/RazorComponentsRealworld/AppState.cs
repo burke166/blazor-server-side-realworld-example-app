@@ -20,12 +20,12 @@ namespace RazorComponentsRealworld
         public ErrorsModel Errors { get; private set; }
         public UserModel User { get; private set; }
 
-        public bool IsSignedIn => User?.token != null;
+        public bool IsSignedIn => User?.Token != null;
 
         public void UpdateUser(UserModel user)
         {
             User = user;
-            var token = User?.token;
+            var token = User?.Token;
 
             if (token != null)
                 api.SetToken(token);

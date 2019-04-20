@@ -1,27 +1,38 @@
 ﻿using System;
+using Newtonsoft.Json;
 
 namespace RazorComponentsRealworld.Model
 {
     public class UserModel
     {
-        public string email { get; set; }
-        public string username { get; set; }
-        public string bio { get; set; }
-        public string image { get; set; }
-        public string token { get; set; }
-        public string password { get; set; }
+        public string Email { get; set; }
+        public string Username { get; set; }
+        public string Bio { get; set; }
+        public string Image { get; set; }
+        public string Token { get; set; }
 
         public UserModel Clone()
         {
             return new UserModel
             {
-                // Password and token will not be cloned.
+                // token will not be cloned.
 
-                email = email,
-                username = username,
-                bio = bio,
-                image = image
+                Email = Email,
+                Username = Username,
+                Bio = Bio,
+                Image = Image
             };
         }
+    }
+    public class UserCredentials
+    {
+        [JsonProperty(PropertyName = "username")]
+        public string Username { get; set; }
+
+        [JsonProperty(PropertyName = "email")]
+        public string Email { get; set; }
+
+        [JsonProperty(PropertyName = "password")]
+        public string Password { get; set; }
     }
 }
