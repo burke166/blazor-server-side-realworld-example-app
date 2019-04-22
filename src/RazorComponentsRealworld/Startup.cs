@@ -20,7 +20,16 @@ namespace RazorComponentsRealWorld
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddSingleton<WeatherForecastService>();
+
+            services.AddTransient<Services.IJwtService, Services.JwtService>();
+            services.AddTransient<Services.IConsoleLogService, Services.ConsoleLogService>();
+            services.AddTransient<Services.ArticlesService>();
+            services.AddTransient<Services.CommentsService>();
+            services.AddTransient<Services.TagsService>();
+
+            services.AddScoped<Services.IApiService, Services.ApiService>();
+            services.AddScoped<System.Net.Http.HttpClient>();
+            services.AddScoped<Services.UserService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

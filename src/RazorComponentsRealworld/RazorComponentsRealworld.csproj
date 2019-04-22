@@ -6,4 +6,9 @@
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="HtmlSanitizer" Version="4.0.210" />
+    <PackageReference Include="Markdig" Version="0.16.0" />
+  </ItemGroup>
+
 </Project>

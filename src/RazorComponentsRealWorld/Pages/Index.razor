@@ -1,5 +1,133 @@
 ﻿@page "/"
+@using RazorComponentsRealWorld.Models;
+@using RazorComponentsRealWorld.Services;
+@inject IUriHelper uriHelper;
+@inject ArticlesService articlesApi;
+@inject TagsService tagsApi;
+@inject UserService userApi;
 
-<h1>Hello, world!</h1>
+<div class="home-page">
+    @if (!userApi.IsAuthenticated)
+    {
+        <div class="banner">
+            <div class="container">
+                <h1 class="logo-font">conduit</h1>
+                <p>A place to share your knowledge.</p>
+            </div>
+        </div>
+    }
+    <div class="container page">
+        <div class="row">
+            <div class="col-md-9">
+                <div class="feed-toggle">
+                    <ul class="nav nav-pills outline-active">
+                        <li class="nav-item">
+                            <a href="" class="@($"nav-link {FeedState}")" onclick="@YourFeedAsync">Your Feed</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="" class="@($"nav-link {GlobalState}")" onclick="@GlobalFeedAsync">Global Feed</a>
+                        </li>
+                        @if (selectedTab == SelectedTab.Tag)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link active"><i class="ion-pound"></i> @selectedTag</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+                <ArticleList Articles=@articles />
+            </div>
+            <div class="col-md-3">
+                <div class="sidebar">
+                    <p>Popular Tags</p>
+                    <div class="tag-list">
+                        @if (tags == null)
+                        {
+                            <text>Loading tags...</text>
+                        }
+                        else
+                        {
+                            foreach (var tag in tags)
+                            {
+                                <a href="" class="tag-pill tag-default" onclick="@(() => SelectTag(tag))">@tag</a>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-Welcome to your new app.
+@functions {
+    IEnumerable<ArticleModel> articles;
+    IEnumerable<string> tags;
+    SelectedTab selectedTab;
+    string selectedTag;
+
+    string FeedState
+    {
+        get
+        {
+            if (!userApi.IsAuthenticated) { return "disabled" ; }
+            if (selectedTab == SelectedTab.Feed) { return "active"; }
+            return "";
+        }
+    }
+
+    string GlobalState => selectedTab == SelectedTab.Global ? "active" : "";
+
+    protected override async Task OnInitAsync()
+    {
+        await GlobalFeedAsync();
+        tags = await tagsApi.GetAllAsync();
+    }
+
+    void DisplayResponse(ApiResponse<ArticlesResponse> response)
+    {
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            articles = response.Value?.Articles;
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+        }
+    }
+
+    async Task YourFeedAsync()
+    {
+        selectedTab = SelectedTab.Feed;
+        var response = await articlesApi.GetFeedAsync();
+        DisplayResponse(response);
+    }
+
+    async Task GlobalFeedAsync()
+    {
+        selectedTab = SelectedTab.Global;
+        var response = await articlesApi.GetAllAsync();
+        DisplayResponse(response);
+    }
+
+    async Task SelectTag(string tag)
+    {
+        selectedTab = SelectedTab.Tag;
+        selectedTag = tag;
+        var response = await articlesApi.GetByTagAsync(tag);
+        DisplayResponse(response);
+    }
+
+    enum SelectedTab
+    {
+        Feed,
+        Global,
+        Tag
+    }
+}

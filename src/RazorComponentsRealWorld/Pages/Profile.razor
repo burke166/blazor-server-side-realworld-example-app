@@ -1,0 +1,100 @@
+﻿@page "/profile/{Username}"
+@using RazorComponentsRealWorld.Models
+@using RazorComponentsRealWorld.Services
+@inject ProfilesService profilesApi
+@inject ArticlesService articlesApi
+@inject IUriHelper uriHelper
+
+<div class="profile-page">
+    <div class="user-info">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12 col-md-10 offset-md-1">
+                    <img src="@profile.image" class="user-img" />
+                    <h4>@Username</h4>
+                    <p>
+                        @profile.bio
+                    </p>
+                    <button class="btn btn-sm btn-outline-secondary action-btn">
+                        <i class="ion-plus-round"></i>
+                        &nbsp;
+                        Follow @Username
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-10 offset-md-1">
+                <div class="articles-toggle">
+                    <ul class="nav nav-pills outline-active">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="">My Articles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="">Favorited Articles</a>
+                        </li>
+                    </ul>
+                </div>
+                <ArticleList Articles=@articles />
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions
+{
+    [Parameter]
+    public string Username { get; set; }
+
+    ProfileModel profile = new ProfileModel();
+    IEnumerable<ArticleModel> articles = null;
+
+    protected override async Task OnInitAsync()
+    {
+        await DisplayProfileAsync();
+        await DisplayArticlesAsync();
+    }
+
+    private async Task DisplayProfileAsync()
+    {
+        var response = await profilesApi.GetAsync(Username);
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            profile = response.Value?.Profile;
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+        }
+    }
+
+    private async Task DisplayArticlesAsync()
+    {
+        var response = await articlesApi.GetByAuthorAsync(Username);
+
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            articles = response.Value?.Articles;
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+        }
+    }
+}

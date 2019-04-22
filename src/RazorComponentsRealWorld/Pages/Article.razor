@@ -1,0 +1,198 @@
+﻿@page "/article/{Slug}"
+@using RazorComponentsRealWorld.Models
+@using RazorComponentsRealWorld.Services
+@inject IUriHelper uriHelper
+@inject StateService state
+@inject CommentsService commentsApi
+@inject ArticlesService articlesApi
+
+@if (article != null)
+{
+<div class="article-page">
+
+    <div class="banner">
+        <div class="container">
+            <h1>@article.Title</h1>
+
+            <div class="article-meta">
+                <a href="/profile/@article.Author.Username"><img src="@article.Author.Image" /></a>
+                <div class="info">
+                    <a href="" class="author">@article.Author.Username</a>
+                    <span class="date">@article.CreatedAt.ToLongDateString()</span>
+                </div>
+                @if (article.Author.Username == state.User.Username)
+                {
+                    <a class="btn btn-outline-secondary btn-sm" href="/editor/@Slug">
+                        <i class="ion-edit"></i>
+                        &nbsp;
+                        Edit Article
+                    </a>
+                    <text>&nbsp; &nbsp;</text>
+                    <button class="btn btn-outline-danger btn-sm" onclick="@DeleteArticle">
+                        <i class="ion-trash-a"></i>
+                        &nbsp;
+                        Delete Article
+                    </button>
+                }
+                else
+                {
+                    <button class="btn btn-sm btn-outline-secondary">
+                        <i class="ion-plus-round"></i>
+                        &nbsp;
+                        Follow @article.Author.Username <span class="counter">(10)</span>
+                    </button>
+                    <text>&nbsp; &nbsp;</text>
+                    <button class="btn btn-sm btn-outline-primary">
+                        <i class="ion-heart"></i>
+                        &nbsp;
+                        Favorite Post <span class="counter">(@article.FavoritesCount)</span>
+                    </button>
+                }
+            </div>
+
+        </div>
+    </div>
+
+    <div class="container page">
+
+        <div class="row article-content">
+            <div id="article-body" class="col-md-12">
+                <MarkdownView Content="@article.Body" />
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="article-actions">
+            <div class="article-meta">
+                <a href="profile.html"><img src="@article.Author.Image" /></a>
+                <div class="info">
+                    <a href="" class="author">@article.Author.Username</a>
+                    <span class="date">@article.CreatedAt.ToLongDateString()</span>
+                </div>
+
+                <button class="btn btn-sm btn-outline-secondary">
+                    <i class="ion-plus-round"></i>
+                    &nbsp;
+                    Follow @article.Author.Username <span class="counter">(10)</span>
+                </button>
+                &nbsp;
+                <button class="btn btn-sm btn-outline-primary">
+                    <i class="ion-heart"></i>
+                    &nbsp;
+                    Favorite Post <span class="counter">(@article.FavoritesCount)</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col-xs-12 col-md-8 offset-md-2">
+
+                @if (state.IsSignedIn)
+                {
+                    <form class="card comment-form">
+                        <div class="card-block">
+                            <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
+                        </div>
+                        <div class="card-footer">
+                            <img src="@state.User.Image" class="comment-author-img" />
+                            <button class="btn btn-sm btn-primary">
+                                Post Comment
+                            </button>
+                        </div>
+                    </form>
+                }
+                else
+                {
+                    <p show-authed="false" style="display: inherit;">
+                        <NavLink href="/signin">Sign in</NavLink> or <NavLink href="/signup">sign up</NavLink> to add comments on this article.
+                    </p>
+                }
+
+                @if (comments != null || comments.Count() > 0)
+                {
+                    @foreach (CommentModel comment in comments)
+                    {
+                        <div class="card">
+                            <div class="card-block">
+                                <p class="card-text"><MarkdownView Content="@comment.Body" /></p>
+                            </div>
+                            <div class="card-footer">
+                                <a href="" class="comment-author">
+                                    <img src="@comment.Author.Image" class="comment-author-img" />
+                                </a>
+                                &nbsp;
+                                <a href="" class="comment-author">@comment.Author.Username</a>
+                                <span class="date-posted">@comment.CreatedAt.ToShortDateString()</span>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+}
+
+@functions
+{
+    [Parameter]
+    public string Slug { get; set; }
+
+    ArticleModel article = null;
+    CommentModel[] comments = null;
+
+    protected override async Task OnInitAsync()
+    {
+        var response = await articlesApi.GetAsync(Slug);
+        DisplayArticle(response);
+
+        var comments = await commentsApi.GetAllAsync(Slug);
+        DisplayComments(comments);
+    }
+
+    private void DisplayArticle(ApiResponse<ArticleResponse> response)
+    {
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            article = response.Value?.Article;
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+        }
+    }
+
+    private void DisplayComments(ApiResponse<CommentsResponse> response)
+    {
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            comments = response.Value?.Comments.ToArray();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+        }
+    }
+
+    async Task DeleteArticle()
+    {
+        await articlesApi.DeleteAsync(Slug);
+        uriHelper.NavigateTo("/");
+    }
+}
