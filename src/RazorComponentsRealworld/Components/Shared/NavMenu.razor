@@ -1,8 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Components.Services
-@inject AppState state
-@inject ApiClient api
+@using RazorComponentsRealworld.Model;
+@using RazorComponentsRealworld.Services;
 @inject IUriHelper uriHelper
-@inject IJSRuntime jsRuntime
+@inject UserService userApi
+
 <nav class="navbar navbar-light">
     <div class="container">
         <NavLink class="navbar-brand" href="/" Match=NavLinkMatch.All>conduit</NavLink>
@@ -12,10 +13,10 @@
                     Home
                 </NavLink>
             </li>
-            @if (state.IsSignedIn)
+            @if (isAuthenticated)
             {
-                var username = state.User?.Username;
-                var image = state.User?.Image;
+                var username = user?.Username;
+                var image = user?.Image;
 
                 <li class="nav-item">
                     <NavLink class="nav-link" href="/editor">
@@ -34,7 +35,7 @@
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/" onclick="@(SignOut)">
+                    <a class="nav-link" href="/" onclick="@SignOut()">
                         Sign out
                     </a>
                 </li>
@@ -57,11 +58,13 @@
 </nav>
 
 @functions {
-    async void SignOut()
+
+    UserModel user = new UserModel();
+    bool isAuthenticated = false;
+
+    public async Task SignOut()
     {
-        api.ClearToken();
-        state.UpdateUser(null);
-        await jsRuntime.InvokeAsync<bool>("Realworld.deleteStoredToken");
+        await userApi.SignOutAsync();
         uriHelper.NavigateTo("/");
     }
 }

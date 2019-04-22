@@ -13,16 +13,19 @@ namespace RazorComponentsRealworld.Services
         const string BaseUrl = "https://conduit.productionready.io/api";
         private HttpClient httpClient;
         private IConsoleLogService console;
-
-        public ApiService(HttpClient _httpClient, IConsoleLogService _console)
+        private IJwtService jwt;
+        
+        public ApiService(HttpClient _httpClient, IConsoleLogService _console, IJwtService _jwt)
         {
             httpClient = _httpClient;
             console = _console;
+            jwt = _jwt;
         }
 
-        public void SetToken(string Token)
+        public void SetToken(string token)
         {
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", Token);
+            if (!string.IsNullOrEmpty(token))
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Token", token);
         }
 
         public void ClearToken()
@@ -103,7 +106,7 @@ namespace RazorComponentsRealworld.Services
         public System.Net.HttpStatusCode StatusCode { get; set; }
         public bool HasSuccessStatusCode { get; set; }
 
-        public ApiResponse()
+        private ApiResponse()
         {
 
         }
@@ -123,7 +126,7 @@ namespace RazorComponentsRealworld.Services
             else
             {
                 ErrorResponse errors = JsonConvert.DeserializeObject<ErrorResponse>(data);
-                Errors = errors.Errors;
+                Errors = errors?.Errors;
             }
 
             return this;

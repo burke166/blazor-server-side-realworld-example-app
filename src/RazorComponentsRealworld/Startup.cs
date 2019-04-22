@@ -32,17 +32,17 @@ namespace RazorComponentsRealworld
                 return sanitizer;
             });
 
-            services.AddTransient<System.Net.Http.HttpClient>();
-            services.AddTransient<Services.IApiService, Services.ApiService>();
             services.AddTransient<Services.IJwtService, Services.JwtService>();
             services.AddTransient<Services.IConsoleLogService, Services.ConsoleLogService>();
             services.AddTransient<Services.ArticlesService>();
             services.AddTransient<Services.CommentsService>();
             services.AddTransient<Services.TagsService>();
-            services.AddTransient<Services.UserService>();
 
-            services.AddSingleton<AppState>();
-            services.AddSingleton<ApiClient>();
+            services.AddScoped<Services.IApiService, Services.ApiService>();
+            services.AddScoped<System.Net.Http.HttpClient>();
+            services.AddScoped<Services.UserService>();
+            services.AddScoped<AppState>();
+            services.AddScoped<ApiClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

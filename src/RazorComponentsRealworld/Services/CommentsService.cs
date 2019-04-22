@@ -14,21 +14,21 @@ namespace RazorComponentsRealworld.Services
             api = _api;
         }
 
-        public async Task<CommentModel> AddAsync(string Slug, CommentModel Comment)
+        public async Task<ApiResponse<CommentResponse>> AddAsync(string Slug, CommentModel Comment)
         {
-            var response = await api.PostAsync<CommentModel>($"/articles/{Slug}/comments", Comment);
-            return response?.Value;
+            var response = await api.PostAsync<CommentResponse>($"/articles/{Slug}/comments", Comment);
+            return response;
         }
 
-        public async Task<CommentModel> AddAsync(ArticleModel Article, CommentModel Comment)
+        public async Task<ApiResponse<CommentResponse>> AddAsync(ArticleModel Article, CommentModel Comment)
         {
             return await AddAsync(Article.Slug, Comment);
         }
 
-        public async Task<IEnumerable<CommentModel>> GetAllAsync(string Slug)
+        public async Task<ApiResponse<CommentsResponse>> GetAllAsync(string Slug)
         {
-            var response = await api.GetAsync<CommentRepsonse>($"/articles/{Slug}/comments");
-            return response?.Value?.Comments;
+            var response = await api.GetAsync<CommentsResponse>($"/articles/{Slug}/comments");
+            return response;
         }
 
         public async Task<bool> DeleteAsync(string Slug, int CommentId)
@@ -53,8 +53,13 @@ namespace RazorComponentsRealworld.Services
         }
     }
 
-    internal class CommentRepsonse
+    public class CommentsResponse
     {
         public CommentModel[] Comments { get; set; }
+    }
+
+    public class CommentResponse
+    {
+        public CommentModel Comment { get; set; }
     }
 }

@@ -7,26 +7,26 @@ namespace RazorComponentsRealworld.Services
     {
         private IJwtService jwtService;
         private IApiService api;
-        private IConsoleLogService console;
         public UserModel User { get; set; }
         public bool IsAuthenticated { get; set; }
         
-        public UserService(IJwtService _jwtService, IConsoleLogService _console, IApiService _api)
+        public UserService(IJwtService _jwtService, IApiService _api)
         {
             jwtService = _jwtService;
             api = _api;
-            console = _console;
         }
 
-        public async void PopulateAsync()
+        public async Task<UserModel> PopulateAsync()
         {
             if (!string.IsNullOrEmpty(await jwtService.GetTokenAsync())) {
                 var response = await api.GetAsync<UserResponse>("/user");
                 User = response?.Value?.User ?? new UserModel();
+                return User;
             }
             else
             {
-                PurgeAuth();
+                await PurgeAuth();
+                return new UserModel();
             }
         }
 
@@ -37,19 +37,26 @@ namespace RazorComponentsRealworld.Services
                 await jwtService.SaveTokenAsync(user.Token);
                 User = user;
                 IsAuthenticated = true;
+                api.SetToken(user.Token);
             }
             else
             {
-                PurgeAuth();
+                await PurgeAuth();
             }
 
         }
 
-        private async void PurgeAuth()
+        private async Task PurgeAuth()
         {
             await jwtService.DestroyTokenAsync();
             User = new UserModel();
             IsAuthenticated = false;
+            api.ClearToken();
+        }
+
+        public async Task SignOutAsync()
+        {
+            await PurgeAuth();
         }
 
         public async Task<ApiResponse<UserResponse>> AttemptAuth(string authType, UserCredentials credentials)

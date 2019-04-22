@@ -14,5 +14,11 @@ namespace RazorComponentsRealworld.Model
 
         [JsonProperty(PropertyName = "email or password")]
         public string[] EmailOrPassword { get; set; }
+
+        public string[] Authentication { get; set; }
+
+        public string[] Authorization { get; set; }
+
+        public string[] Other { get; set; }
     }
 }

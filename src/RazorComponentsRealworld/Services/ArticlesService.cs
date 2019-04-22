@@ -13,21 +13,40 @@ namespace RazorComponentsRealworld.Services
             api = _api;
         }
 
-        public async Task<IEnumerable<ArticleModel>> QueryAsync(IDictionary<string, string> Params = null)
+        public async Task<ApiResponse<ArticlesResponse>> QueryAsync(IDictionary<string, string> Params = null)
         {
-            ApiResponse<ArticlesResponse> articles = await api.GetAsync<ArticlesResponse>($"/articles/", Params);
-            return articles?.Value?.Articles;
+            return await api.GetAsync<ArticlesResponse>($"/articles/", Params);
         }
 
-        public async Task<IEnumerable<ArticleModel>> GetAllAsync()
+        public async Task<ApiResponse<ArticlesResponse>> GetAllAsync()
         {
             return await QueryAsync();
         }
 
-        public async Task<ArticleModel> GetAsync(string Slug)
+        public async Task<ApiResponse<ArticleResponse>> GetAsync(string Slug)
         {
-            ApiResponse<ArticleResponse> article = await api.GetAsync<ArticleResponse>($"/articles/{Slug}");
-            return article?.Value?.Article;
+            return await api.GetAsync<ArticleResponse>($"/articles/{Slug}");
+        }
+
+        public async Task<ApiResponse<ArticlesResponse>> GetFeedAsync()
+        {
+            return await api.GetAsync<ArticlesResponse>($"/articles/feed");
+        }
+
+        public async Task<ApiResponse<ArticlesResponse>> GetByAuthorAsync(string author)
+        {
+            return await QueryAsync(new Dictionary<string, string>
+            {
+                {  "author", author }
+            });
+        }
+
+        public async Task<ApiResponse<ArticlesResponse>> GetByTagAsync(string tag)
+        {
+            return await QueryAsync(new Dictionary<string, string>
+            {
+                {  "tag", tag }
+            });
         }
 
         public async Task<bool> DeleteAsync(string Slug)
@@ -65,12 +84,12 @@ namespace RazorComponentsRealworld.Services
         }
     }
 
-    internal class ArticlesResponse
+    public class ArticlesResponse
     {
         public ArticleModel[] Articles { get; set; }
     }
 
-    internal class ArticleResponse
+    public class ArticleResponse
     {
         public ArticleModel Article { get; set; }
     }

@@ -8,7 +8,7 @@ namespace RazorComponentsRealworld.Services
 {
     public interface IApiService
     {
-        void SetToken(string Token);
+        void SetToken(string token);
         void ClearToken();
         Task<ApiResponse<T>> GetAsync<T>(string Path, IDictionary<string, string> Params = null);
         Task<ApiResponse<T>> PutAsync<T>(string Path, IDictionary<string, string> Params, object Value);

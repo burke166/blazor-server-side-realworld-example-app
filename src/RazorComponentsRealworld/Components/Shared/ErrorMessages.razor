@@ -29,6 +29,10 @@
     {
         <li>The email or password @error.</li>
     }
+    @foreach (var error in Errors?.Other ?? new string[0])
+    {
+        <li>An error has occurred: @error.</li>
+    }
 </ul>
 
 @functions {

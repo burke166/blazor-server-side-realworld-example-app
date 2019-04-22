@@ -143,12 +143,46 @@
 
     ArticleModel article = null;
     CommentModel[] comments = null;
-    
+
     protected override async Task OnInitAsync()
     {
-        article = await articlesApi.GetAsync(Slug);
-        comments = (await commentsApi.GetAllAsync(Slug)).ToArray(); 
-        StateHasChanged();
+        var response = await articlesApi.GetAsync(Slug);
+        DisplayArticle(response);
+
+        var comments = await commentsApi.GetAllAsync(Slug);
+        DisplayComments(comments);
+    }
+
+    private void DisplayArticle(ApiResponse<ArticleResponse> response)
+    {
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            article = response.Value?.Article;
+            StateHasChanged();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                uriHelper.NavigateTo("/signin");
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                uriHelper.NavigateTo("/signin");
+        }
+    }
+
+    private void DisplayComments(ApiResponse<CommentsResponse> response)
+    {
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            comments = response.Value?.Comments.ToArray();
+            StateHasChanged();
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                uriHelper.NavigateTo("/signin");
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                uriHelper.NavigateTo("/signin");
+        }
     }
 
     async Task DeleteArticle()

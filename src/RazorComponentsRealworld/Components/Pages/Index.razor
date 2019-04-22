@@ -1,13 +1,14 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Services
 @using RazorComponentsRealworld.Model
 @using RazorComponentsRealworld.Services;
-@inject ApiClient api
-@inject AppState state
+@inject IUriHelper uriHelper
 @inject ArticlesService articlesApi
 @inject TagsService tagsApi
+@inject UserService userApi
 
 <div class="home-page">
-    @if (!state.IsSignedIn)
+    @if (!userApi.IsAuthenticated)
     {
         <div class="banner">
             <div class="container">
@@ -22,10 +23,10 @@
                 <div class="feed-toggle">
                     <ul class="nav nav-pills outline-active">
                         <li class="nav-item">
-                            <a href="" class="@($"nav-link {FeedState}")" onclick="@YourFeedAsync">Your Feed</a>
+                            <a href="" class="@($"nav-link {FeedState}")" onclick="@YourFeedAsync()">Your Feed</a>
                         </li>
                         <li class="nav-item">
-                            <a href="" class="@($"nav-link {GlobalState}")" onclick="@GlobalFeedAsync">Global Feed</a>
+                            <a href="" class="@($"nav-link {GlobalState}")" onclick="@GlobalFeedAsync()">Global Feed</a>
                         </li>
                         @if (selectedTab == SelectedTab.Tag)
                         {
@@ -49,7 +50,7 @@
                         {
                             foreach (var tag in tags)
                             {
-                                <a href="" class="tag-pill tag-default" onclick="@(() => SelectTag(tag))">@tag</a>
+                                <a href="" class="tag-pill tag-default" onclick="@SelectTag(tag)">@tag</a>
                             }
                         }
                     </div>
@@ -69,7 +70,7 @@
     {
         get
         {
-            if (!state.IsSignedIn) return "disabled";
+            if (!userApi.IsAuthenticated) return "disabled";
             if (selectedTab == SelectedTab.Feed) return "active";
             return "";
         }
@@ -77,32 +78,47 @@
 
     string GlobalState => selectedTab == SelectedTab.Global ? "active" : "";
 
-    protected override async Task OnInitAsync()
+    protected async Task OnInitAsync()
     {
         await GlobalFeedAsync();
         tags = await tagsApi.GetAllAsync();
     }
 
+    void DisplayResponse(ApiResponse<ArticlesResponse> response)
+    {
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            articles = response.Value?.Articles;
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                uriHelper.NavigateTo("/signin");
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                uriHelper.NavigateTo("/signin");
+        }
+    }
+
     async Task YourFeedAsync()
     {
         selectedTab = SelectedTab.Feed;
-        articles = await api.GetArticleFeedAsync();
-        StateHasChanged();
+        var response = await articlesApi.GetFeedAsync();
+        DisplayResponse(response);
     }
 
     async Task GlobalFeedAsync()
     {
         selectedTab = SelectedTab.Global;
-        articles = await articlesApi.GetAllAsync();
-        StateHasChanged();
+        var response = await articlesApi.GetAllAsync();
+        DisplayResponse(response);
     }
 
     async Task SelectTag(string tag)
     {
         selectedTab = SelectedTab.Tag;
         selectedTag = tag;
-        articles = await api.GetArticlesByTagAsync(tag);
-        StateHasChanged();
+        var response = await articlesApi.GetByTagAsync(tag);
+        DisplayResponse(response);
     }
 
     enum SelectedTab
