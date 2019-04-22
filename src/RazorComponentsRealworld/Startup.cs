@@ -2,17 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Ganss.XSS;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RazorComponentsRealworld.Components;
+using RazorComponentsRealWorld.Data;
 
-namespace RazorComponentsRealworld
+namespace RazorComponentsRealWorld
 {
     public class Startup
     {
@@ -20,29 +18,9 @@ namespace RazorComponentsRealworld
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .AddNewtonsoftJson();
-
-            services.AddRazorComponents();
-
-            services.AddScoped<IHtmlSanitizer, HtmlSanitizer>(x =>
-            {
-                var sanitizer = new HtmlSanitizer();
-                sanitizer.AllowedAttributes.Add("class");
-                return sanitizer;
-            });
-
-            services.AddTransient<Services.IJwtService, Services.JwtService>();
-            services.AddTransient<Services.IConsoleLogService, Services.ConsoleLogService>();
-            services.AddTransient<Services.ArticlesService>();
-            services.AddTransient<Services.CommentsService>();
-            services.AddTransient<Services.TagsService>();
-
-            services.AddScoped<Services.IApiService, Services.ApiService>();
-            services.AddScoped<System.Net.Http.HttpClient>();
-            services.AddScoped<Services.UserService>();
-            services.AddScoped<AppState>();
-            services.AddScoped<ApiClient>();
+            services.AddRazorPages();
+            services.AddServerSideBlazor();
+            services.AddSingleton<WeatherForecastService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,12 +37,15 @@ namespace RazorComponentsRealworld
             }
 
             app.UseHttpsRedirection();
+
             app.UseStaticFiles();
 
-            app.UseRouting(routes =>
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRazorPages();
-                routes.MapComponentHub<App>("app");
+                endpoints.MapBlazorHub();
+                endpoints.MapFallbackToPage("/_Host");
             });
         }
     }
