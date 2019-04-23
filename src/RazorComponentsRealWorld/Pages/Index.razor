@@ -1,13 +1,14 @@
 ﻿@page "/"
 @using RazorComponentsRealWorld.Models;
 @using RazorComponentsRealWorld.Services;
-@inject IUriHelper uriHelper;
-@inject ArticlesService articlesApi;
-@inject TagsService tagsApi;
-@inject UserService userApi;
+@inject IUriHelper uriHelper
+@inject ArticlesService articlesApi
+@inject TagsService tagsApi
+@inject UserService userApi
+@inject StateService state
 
 <div class="home-page">
-    @if (!userApi.IsAuthenticated)
+    @if (!isAuthenticated)
     {
         <div class="banner">
             <div class="container">
@@ -64,12 +65,13 @@
     IEnumerable<string> tags;
     SelectedTab selectedTab;
     string selectedTag;
+    bool isAuthenticated = false;
 
     string FeedState
     {
         get
         {
-            if (!userApi.IsAuthenticated) { return "disabled" ; }
+            if (!isAuthenticated) { return "disabled" ; }
             if (selectedTab == SelectedTab.Feed) { return "active"; }
             return "";
         }
@@ -79,6 +81,7 @@
 
     protected override async Task OnInitAsync()
     {
+        isAuthenticated = state.IsSignedIn;
         await GlobalFeedAsync();
         tags = await tagsApi.GetAllAsync();
     }

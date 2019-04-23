@@ -11,15 +11,14 @@ namespace RazorComponentsRealWorld.Services
     public class ApiService : IApiService
     {
         const string BaseUrl = "https://conduit.productionready.io/api";
+
         private HttpClient httpClient;
         private IConsoleLogService console;
-        private IJwtService jwt;
-        
-        public ApiService(HttpClient _httpClient, IConsoleLogService _console, IJwtService _jwt)
+
+        public ApiService(HttpClient _httpClient, IConsoleLogService _console)
         {
             httpClient = _httpClient;
             console = _console;
-            jwt = _jwt;
         }
 
         public void SetToken(string token)

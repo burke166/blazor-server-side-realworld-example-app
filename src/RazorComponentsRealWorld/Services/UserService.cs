@@ -5,28 +5,26 @@ namespace RazorComponentsRealWorld.Services
 {
     public class UserService
     {
-        private IJwtService jwtService;
-        private IApiService api;
-        public UserModel User { get; set; }
-        public bool IsAuthenticated { get; set; }
+        private readonly IJwtService jwtService;
+        private readonly IApiService api;
+        private readonly StateService state;
         
-        public UserService(IJwtService _jwtService, IApiService _api)
+        public UserService(IJwtService _jwtService, IApiService _api, StateService _state)
         {
             jwtService = _jwtService;
             api = _api;
+            state = _state;
         }
 
-        public async Task<UserModel> PopulateAsync()
+        public async Task PopulateAsync()
         {
             if (!string.IsNullOrEmpty(await jwtService.GetTokenAsync())) {
                 var response = await api.GetAsync<UserResponse>("/user");
-                User = response?.Value?.User ?? new UserModel();
-                return User;
+                state.UpdateUser(response?.Value?.User ?? new UserModel());
             }
             else
             {
                 await PurgeAuth();
-                return new UserModel();
             }
         }
 
@@ -35,9 +33,7 @@ namespace RazorComponentsRealWorld.Services
             if (user != null)
             {
                 await jwtService.SaveTokenAsync(user.Token);
-                User = user;
-                IsAuthenticated = true;
-                api.SetToken(user.Token);
+                state.UpdateUser(user);
             }
             else
             {
@@ -49,9 +45,7 @@ namespace RazorComponentsRealWorld.Services
         private async Task PurgeAuth()
         {
             await jwtService.DestroyTokenAsync();
-            User = new UserModel();
-            IsAuthenticated = false;
-            api.ClearToken();
+            state.UpdateUser(new UserModel());
         }
 
         public async Task SignOutAsync()
@@ -75,7 +69,7 @@ namespace RazorComponentsRealWorld.Services
             var response = await api.PutAsync<UserResponse>("/user", user);
 
             if (response?.Value != null)
-                User = response.Value.User;
+                state.UpdateUser(response.Value.User);
 
             return response;
         }

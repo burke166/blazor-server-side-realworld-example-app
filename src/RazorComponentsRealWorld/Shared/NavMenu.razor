@@ -1,6 +1,7 @@
 @using RazorComponentsRealWorld.Models;
 @using RazorComponentsRealWorld.Services;
 @inject IUriHelper uriHelper
+@inject StateService state
 @inject UserService userApi
 
 <nav class="navbar navbar-light">
@@ -17,40 +18,40 @@
                 var username = user?.Username;
                 var image = user?.Image;
 
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/editor">
-                        <i class="ion-compose"></i>&nbsp;New Post
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/settings">
-                        <i class="ion-gear-a"></i>&nbsp;Settings
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href=@("/profile/" + username)>
-                        <img src="@image" class="user-pic" />
-                        @username
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/" onclick="@SignOut">
-                        Sign out
-                    </a>
-                </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/editor">
+                    <i class="ion-compose"></i>&nbsp;New Post
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/settings">
+                    <i class="ion-gear-a"></i>&nbsp;Settings
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href=@("/profile/" + username)>
+                    <img src="@image" class="user-pic" />
+                    @username
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/" onclick="@SignOut">
+                    Sign out
+                </a>
+            </li>
             }
             else
             {
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/signin">
-                        Sign in
-                    </NavLink>
-                </li>
-                <li class="nav-item">
-                    <NavLink class="nav-link" href="/signup">
-                        Sign up
-                    </NavLink>
-                </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/signin">
+                    Sign in
+                </NavLink>
+            </li>
+            <li class="nav-item">
+                <NavLink class="nav-link" href="/signup">
+                    Sign up
+                </NavLink>
+            </li>
             }
         </ul>
     </div>
@@ -60,6 +61,19 @@
 
     UserModel user = new UserModel();
     bool isAuthenticated = false;
+
+    protected override void OnInit()
+    {
+        Update();
+        state.OnUserChange += Update;
+    }
+
+    private void Update()
+    {
+        user = state.User;
+        isAuthenticated = state.IsSignedIn;
+        StateHasChanged();
+    }
 
     public async Task SignOut()
     {

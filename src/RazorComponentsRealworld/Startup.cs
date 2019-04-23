@@ -26,10 +26,11 @@ namespace RazorComponentsRealWorld
             services.AddTransient<Services.ArticlesService>();
             services.AddTransient<Services.CommentsService>();
             services.AddTransient<Services.TagsService>();
+            services.AddTransient<Services.UserService>();
 
             services.AddScoped<Services.IApiService, Services.ApiService>();
             services.AddScoped<System.Net.Http.HttpClient>();
-            services.AddScoped<Services.UserService>();
+            services.AddScoped<Services.StateService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

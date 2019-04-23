@@ -8,7 +8,7 @@ namespace RazorComponentsRealWorld.Services
 {
     public class ProfilesService
     {
-        private IApiService api;
+        private readonly IApiService api;
 
         public ProfilesService(IApiService _api)
         {

@@ -5,7 +5,7 @@ namespace RazorComponentsRealWorld.Services
 {
     public class StateService
     {
-        private IApiService api;
+        private readonly IApiService api;
 
         public StateService(IApiService api)
         {
@@ -29,6 +29,8 @@ namespace RazorComponentsRealWorld.Services
 
             if (token != null)
                 api.SetToken(token);
+            else
+                api.ClearToken();
 
             NotifyUserChanged();
         }
