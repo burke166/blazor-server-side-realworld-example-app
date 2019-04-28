@@ -18,9 +18,13 @@ namespace RazorComponentsRealWorld.Services
             return await api.GetAsync<ArticlesResponse>($"/articles/", Params);
         }
 
-        public async Task<ApiResponse<ArticlesResponse>> GetAllAsync()
+        public async Task<ApiResponse<ArticlesResponse>> GetArticlesAsync(int offset = 0)
         {
-            return await QueryAsync();
+            return await QueryAsync(new Dictionary<string, string>
+            {
+                { "limit", "10" },
+                { "offset", offset.ToString() }
+            });
         }
 
         public async Task<ApiResponse<ArticleResponse>> GetAsync(string Slug)
@@ -28,24 +32,32 @@ namespace RazorComponentsRealWorld.Services
             return await api.GetAsync<ArticleResponse>($"/articles/{Slug}");
         }
 
-        public async Task<ApiResponse<ArticlesResponse>> GetFeedAsync()
+        public async Task<ApiResponse<ArticlesResponse>> GetFeedAsync(int offset = 0)
         {
-            return await api.GetAsync<ArticlesResponse>($"/articles/feed");
-        }
-
-        public async Task<ApiResponse<ArticlesResponse>> GetByAuthorAsync(string author)
-        {
-            return await QueryAsync(new Dictionary<string, string>
+            return await api.GetAsync<ArticlesResponse>($"/articles/feed", new Dictionary<string, string>
             {
-                {  "author", author }
+                { "limit", "10" },
+                { "offset", offset.ToString() }
             });
         }
 
-        public async Task<ApiResponse<ArticlesResponse>> GetByTagAsync(string tag)
+        public async Task<ApiResponse<ArticlesResponse>> GetByAuthorAsync(string author, int offset = 0)
         {
             return await QueryAsync(new Dictionary<string, string>
             {
-                {  "tag", tag }
+                {  "author", author },
+                { "limit", "10" },
+                { "offset", offset.ToString() }
+            });
+        }
+
+        public async Task<ApiResponse<ArticlesResponse>> GetByTagAsync(string tag, int offset = 0)
+        {
+            return await QueryAsync(new Dictionary<string, string>
+            {
+                { "tag", tag },
+                { "limit", "10" },
+                { "offset", offset.ToString() }
             });
         }
 
@@ -94,6 +106,7 @@ namespace RazorComponentsRealWorld.Services
     public class ArticlesResponse
     {
         public ArticleModel[] Articles { get; set; }
+        public int ArticlesCount { get; set; }
     }
 
     public class ArticleResponse

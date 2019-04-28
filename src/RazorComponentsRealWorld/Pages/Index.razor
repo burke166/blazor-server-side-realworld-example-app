@@ -38,6 +38,7 @@
                         </ul>
                     </div>
                     <ArticleList Articles=@articles />
+                    <Pagination TotalArticles=@articlesCount PageSize="10" bind-CurrentPage=@currentPage OnPageClicked="@(e => SetPage(e))" />
                 </div>
                 <div class="col-md-3">
                     <div class="sidebar">
@@ -64,6 +65,8 @@
 @functions {
     IEnumerable<ArticleModel> articles;
     IEnumerable<string> tags;
+    int articlesCount;
+    int currentPage = 1;
     SelectedTab selectedTab;
     string selectedTag;
 
@@ -80,7 +83,7 @@
     string GlobalState => selectedTab == SelectedTab.Global ? "active" : "";
 
     protected override async Task OnInitAsync()
-    {   
+    {
         state.OnUserChange += Update;
         await GlobalFeedAsync();
         tags = await tagsApi.GetAllAsync();
@@ -89,7 +92,7 @@
     public void Dispose()
     {
         state.OnUserChange -= Update;
-    }    
+    }
 
     void Update()
     {
@@ -101,6 +104,7 @@
         if (response != null && response.HasSuccessStatusCode)
         {
             articles = response.Value?.Articles;
+            articlesCount = response.Value?.ArticlesCount ?? 0;
         }
         else
         {
@@ -118,14 +122,14 @@
     async Task YourFeedAsync()
     {
         selectedTab = SelectedTab.Feed;
-        var response = await articlesApi.GetFeedAsync();
+        var response = await articlesApi.GetFeedAsync(0);
         DisplayResponse(response);
     }
 
     async Task GlobalFeedAsync()
     {
         selectedTab = SelectedTab.Global;
-        var response = await articlesApi.GetAllAsync();
+        var response = await articlesApi.GetArticlesAsync(0);
         DisplayResponse(response);
     }
 
@@ -133,7 +137,29 @@
     {
         selectedTab = SelectedTab.Tag;
         selectedTag = tag;
-        var response = await articlesApi.GetByTagAsync(tag);
+        var response = await articlesApi.GetByTagAsync(tag, 0);
+        DisplayResponse(response);
+    }
+
+    async Task SetPage(int page)
+    {
+        currentPage = page;
+        Console.WriteLine("Parent change page to " + currentPage.ToString());
+        int offset = (currentPage - 1) * 10;
+        ApiResponse<ArticlesResponse> response;
+
+        if (selectedTab == SelectedTab.Feed)
+        {
+            response = await articlesApi.GetArticlesAsync(offset);
+        }
+        else if (selectedTab == SelectedTab.Tag)
+        {
+            response = await articlesApi.GetByTagAsync(selectedTag, offset);
+        }
+        else
+        {
+            response = await articlesApi.GetArticlesAsync(offset);
+        }
         DisplayResponse(response);
     }
 
