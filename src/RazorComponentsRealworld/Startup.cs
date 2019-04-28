@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using RazorComponentsRealWorld.Data;
 
 namespace RazorComponentsRealWorld
 {
@@ -23,6 +22,7 @@ namespace RazorComponentsRealWorld
 
             services.AddTransient<Services.IJwtService, Services.JwtService>();
             services.AddTransient<Services.IConsoleLogService, Services.ConsoleLogService>();
+            services.AddTransient<Ganss.XSS.IHtmlSanitizer, Ganss.XSS.HtmlSanitizer>();
             services.AddTransient<Services.ArticlesService>();
             services.AddTransient<Services.CommentsService>();
             services.AddTransient<Services.TagsService>();

@@ -1,4 +1,5 @@
 ﻿@page "/article/{Slug}"
+@implements IDisposable
 @using RazorComponentsRealWorld.Models
 @using RazorComponentsRealWorld.Services
 @inject IUriHelper uriHelper
@@ -145,11 +146,23 @@
 
     protected override async Task OnInitAsync()
     {
+        state.OnUserChange += Update;
+
         var response = await articlesApi.GetAsync(Slug);
         DisplayArticle(response);
 
         var comments = await commentsApi.GetAllAsync(Slug);
         DisplayComments(comments);
+    }
+
+    public void Dispose()
+    {
+        state.OnUserChange -= Update;
+    }    
+
+    void Update()
+    {
+        StateHasChanged();
     }
 
     private void DisplayArticle(ApiResponse<ArticleResponse> response)

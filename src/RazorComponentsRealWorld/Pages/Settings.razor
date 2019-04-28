@@ -30,7 +30,7 @@
                         <fieldset class="form-group">
                             <input class="form-control form-control-lg" type="password" placeholder="Password" bind="@(userCredentials.Password)" />
                         </fieldset>
-                        <button class="btn btn-lg btn-primary pull-xs-right" onclick="@Submit">
+                        <button class="btn btn-lg btn-primary pull-xs-right" type="button" onclick="@Submit">
                             Update Settings
                         </button>
                     </fieldset>
@@ -49,6 +49,7 @@
     protected override void OnInit()
     {
         state.OnUserChange += UserHasLoaded;
+        UserHasLoaded();
     }
 
     public void Dispose()
@@ -58,7 +59,8 @@
 
     void UserHasLoaded()
     {
-        userModel = state.User.Clone();
+        userModel = state.User?.Clone() ?? new UserModel();
+        StateHasChanged();
     }
 
     async Task Submit()

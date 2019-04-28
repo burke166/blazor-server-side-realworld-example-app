@@ -72,7 +72,10 @@ namespace RazorComponentsRealWorld.Services
 
         public async Task<ApiResponse<UserResponse>> UpdateAsync(UserModel user)
         {
-            var response = await api.PutAsync<UserResponse>("/user", user);
+            var response = await api.PutAsync<UserResponse>("/user", new
+            {
+                user = user
+            });
 
             if (response?.Value != null)
                 state.UpdateUser(response.Value.User);
