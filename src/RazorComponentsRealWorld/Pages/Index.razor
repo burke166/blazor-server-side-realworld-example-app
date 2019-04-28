@@ -9,7 +9,7 @@
 @inject StateService state
 
     <div class="home-page">
-        @if (!(state?.IsSignedIn ?? false))
+        @if (!state.IsSignedIn)
     {
         <div class="banner">
             <div class="container">
@@ -66,13 +66,12 @@
     IEnumerable<string> tags;
     SelectedTab selectedTab;
     string selectedTag;
-    //bool isAuthenticated = state?.IsSignedIn ?? false;
 
     string FeedState
     {
         get
         {
-            if (!(state?.IsSignedIn ?? false)) { return "disabled" ; }
+            if (!state.IsSignedIn) { return "disabled" ; }
             if (selectedTab == SelectedTab.Feed) { return "active"; }
             return "";
         }
@@ -94,7 +93,6 @@
 
     void Update()
     {
-        //isAuthenticated = state.IsSignedIn;
         StateHasChanged();
     }
 

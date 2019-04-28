@@ -14,7 +14,7 @@
                     Home
                 </NavLink>
             </li>
-            @if (isAuthenticated)
+            @if (state.IsSignedIn)
             {
                 var username = user?.Username;
                 var image = user?.Image;
@@ -61,12 +61,10 @@
 @functions {
 
     UserModel user = new UserModel();
-    bool isAuthenticated = false;
 
     protected override void OnInit()
     {
         user = state.User;
-        isAuthenticated = state.IsSignedIn;
         state.OnUserChange += Update;
         base.OnInit();
     }
@@ -85,7 +83,6 @@
     private void Update()
     {
         user = state.User;
-        isAuthenticated = state.IsSignedIn;
         StateHasChanged();
     }
 
