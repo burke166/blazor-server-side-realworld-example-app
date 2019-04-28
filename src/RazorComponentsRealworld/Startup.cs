@@ -27,6 +27,7 @@ namespace RazorComponentsRealWorld
             services.AddTransient<Services.CommentsService>();
             services.AddTransient<Services.TagsService>();
             services.AddTransient<Services.UserService>();
+            services.AddTransient<Services.ProfilesService>();
 
             services.AddScoped<Services.IApiService, Services.ApiService>();
             services.AddScoped<System.Net.Http.HttpClient>();

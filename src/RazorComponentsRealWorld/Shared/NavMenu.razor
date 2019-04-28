@@ -1,3 +1,4 @@
+@implements IDisposable
 @using RazorComponentsRealWorld.Models;
 @using RazorComponentsRealWorld.Services;
 @inject IUriHelper uriHelper
@@ -18,40 +19,40 @@
                 var username = user?.Username;
                 var image = user?.Image;
 
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/editor">
-                    <i class="ion-compose"></i>&nbsp;New Post
-                </NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/settings">
-                    <i class="ion-gear-a"></i>&nbsp;Settings
-                </NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href=@("/profile/" + username)>
-                    <img src="@image" class="user-pic" />
-                    @username
-                </NavLink>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/" onclick="@SignOut">
-                    Sign out
-                </a>
-            </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/editor">
+                        <i class="ion-compose"></i>&nbsp;New Post
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/settings">
+                        <i class="ion-gear-a"></i>&nbsp;Settings
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href=@("/profile/" + username)>
+                        <img src="@image" class="user-pic" />
+                        @username
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/" onclick="@SignOut">
+                        Sign out
+                    </a>
+                </li>
             }
             else
             {
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/signin">
-                    Sign in
-                </NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="/signup">
-                    Sign up
-                </NavLink>
-            </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/signin">
+                        Sign in
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/signup">
+                        Sign up
+                    </NavLink>
+                </li>
             }
         </ul>
     </div>
@@ -64,8 +65,21 @@
 
     protected override void OnInit()
     {
-        Update();
+        user = state.User;
+        isAuthenticated = state.IsSignedIn;
         state.OnUserChange += Update;
+        base.OnInit();
+    }
+
+    protected override async Task OnAfterRenderAsync()
+    {
+        await userApi.PopulateAsync();
+        await base.OnAfterRenderAsync();
+    }
+
+    public void Dispose()
+    {
+        state.OnUserChange -= Update;
     }
 
     private void Update()

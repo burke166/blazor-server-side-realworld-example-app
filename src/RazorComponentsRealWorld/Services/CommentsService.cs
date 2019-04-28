@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using RazorComponentsRealWorld.Models;
 
 namespace RazorComponentsRealWorld.Services

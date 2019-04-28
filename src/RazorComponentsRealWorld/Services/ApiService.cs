@@ -124,8 +124,15 @@ namespace RazorComponentsRealWorld.Services
             }
             else
             {
-                ErrorResponse errors = JsonConvert.DeserializeObject<ErrorResponse>(data);
-                Errors = errors?.Errors;
+                try
+                {
+                    ErrorResponse errors = JsonConvert.DeserializeObject<ErrorResponse>(data);
+                    Errors = errors?.Errors;
+                }
+                catch
+                {
+                    Console.WriteLine(data);
+                }
             }
 
             return this;

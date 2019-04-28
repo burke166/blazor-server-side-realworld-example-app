@@ -24,15 +24,20 @@ namespace RazorComponentsRealWorld.Services
 
         public void UpdateUser(UserModel user)
         {
-            User = user;
-            var token = User?.Token;
+            var oldToken = User?.Token;
+            var newToken = user?.Token;
 
-            if (token != null)
-                api.SetToken(token);
-            else
-                api.ClearToken();
+            if (oldToken != newToken)
+            {
+                User = user;
 
-            NotifyUserChanged();
+                if (newToken != null)
+                    api.SetToken(newToken);
+                else
+                    api.ClearToken();
+
+                NotifyUserChanged();
+            }
         }
     }
 }

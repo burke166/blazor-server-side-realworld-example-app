@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using RazorComponentsRealWorld.Models;
 
 namespace RazorComponentsRealWorld.Services
@@ -15,10 +12,21 @@ namespace RazorComponentsRealWorld.Services
             api = _api;
         }
 
-        public async Task<ApiResponse<ProfileResponse>> GetAsync(string Slug)
+        public async Task<ApiResponse<ProfileResponse>> GetAsync(string username)
         {
-            return await api.GetAsync<ProfileResponse>($"/articles/{Slug}");
+            return await api.GetAsync<ProfileResponse>($"/profiles/{username}");
         }
+
+        public async Task<ApiResponse<ProfileResponse>> FollowAsync(string username)
+        {
+            return await api.PostAsync<ProfileResponse>($"/profiles/{username}/follow", null);
+        }
+
+        public async Task<ApiResponse<ProfileResponse>> UnfollowAsync(string username)
+        {
+            return await api.PostAsync<ProfileResponse>($"/profiles/{username}/follow", null);
+        }
+
     }
 
     public class ProfileResponse

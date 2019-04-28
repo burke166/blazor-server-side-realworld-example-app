@@ -1,4 +1,5 @@
 ﻿@page "/"
+@implements IDisposable
 @using RazorComponentsRealWorld.Models;
 @using RazorComponentsRealWorld.Services;
 @inject IUriHelper uriHelper
@@ -7,8 +8,8 @@
 @inject UserService userApi
 @inject StateService state
 
-<div class="home-page">
-    @if (!isAuthenticated)
+    <div class="home-page">
+        @if (!(state?.IsSignedIn ?? false))
     {
         <div class="banner">
             <div class="container">
@@ -17,32 +18,32 @@
             </div>
         </div>
     }
-    <div class="container page">
-        <div class="row">
-            <div class="col-md-9">
-                <div class="feed-toggle">
-                    <ul class="nav nav-pills outline-active">
-                        <li class="nav-item">
-                            <a href="" class="@($"nav-link {FeedState}")" onclick="@YourFeedAsync">Your Feed</a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="" class="@($"nav-link {GlobalState}")" onclick="@GlobalFeedAsync">Global Feed</a>
-                        </li>
-                        @if (selectedTab == SelectedTab.Tag)
+        <div class="container page">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="feed-toggle">
+                        <ul class="nav nav-pills outline-active">
+                            <li class="nav-item">
+                                <a href="" class="@($"nav-link {FeedState}")" onclick="@YourFeedAsync">Your Feed</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="@($"nav-link {GlobalState}")" onclick="@GlobalFeedAsync">Global Feed</a>
+                            </li>
+                            @if (selectedTab == SelectedTab.Tag)
                         {
                             <li class="nav-item">
                                 <a class="nav-link active"><i class="ion-pound"></i> @selectedTag</a>
                             </li>
                         }
-                    </ul>
+                        </ul>
+                    </div>
+                    <ArticleList Articles=@articles />
                 </div>
-                <ArticleList Articles=@articles />
-            </div>
-            <div class="col-md-3">
-                <div class="sidebar">
-                    <p>Popular Tags</p>
-                    <div class="tag-list">
-                        @if (tags == null)
+                <div class="col-md-3">
+                    <div class="sidebar">
+                        <p>Popular Tags</p>
+                        <div class="tag-list">
+                            @if (tags == null)
                         {
                             <text>Loading tags...</text>
                         }
@@ -50,28 +51,28 @@
                         {
                             foreach (var tag in tags)
                             {
-                                <a href="" class="tag-pill tag-default" onclick="@(() => SelectTag(tag))">@tag</a>
+                            <a href="" class="tag-pill tag-default" onclick="@(() => SelectTag(tag))">@tag</a>
                             }
                         }
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 @functions {
     IEnumerable<ArticleModel> articles;
     IEnumerable<string> tags;
     SelectedTab selectedTab;
     string selectedTag;
-    bool isAuthenticated = false;
+    //bool isAuthenticated = state?.IsSignedIn ?? false;
 
     string FeedState
     {
         get
         {
-            if (!isAuthenticated) { return "disabled" ; }
+            if (!(state?.IsSignedIn ?? false)) { return "disabled" ; }
             if (selectedTab == SelectedTab.Feed) { return "active"; }
             return "";
         }
@@ -80,10 +81,21 @@
     string GlobalState => selectedTab == SelectedTab.Global ? "active" : "";
 
     protected override async Task OnInitAsync()
-    {
-        isAuthenticated = state.IsSignedIn;
+    {   
+        state.OnUserChange += Update;
         await GlobalFeedAsync();
         tags = await tagsApi.GetAllAsync();
+    }
+
+    public void Dispose()
+    {
+        state.OnUserChange -= Update;
+    }    
+
+    void Update()
+    {
+        //isAuthenticated = state.IsSignedIn;
+        StateHasChanged();
     }
 
     void DisplayResponse(ApiResponse<ArticlesResponse> response)

@@ -18,7 +18,10 @@ namespace RazorComponentsRealWorld.Services
 
         public async Task PopulateAsync()
         {
-            if (!string.IsNullOrEmpty(await jwtService.GetTokenAsync())) {
+            string token = await jwtService.GetTokenAsync();
+
+            if (!string.IsNullOrEmpty(token)) {
+                api.SetToken(token);
                 var response = await api.GetAsync<UserResponse>("/user");
                 state.UpdateUser(response?.Value?.User ?? new UserModel());
             }
@@ -44,8 +47,11 @@ namespace RazorComponentsRealWorld.Services
 
         private async Task PurgeAuth()
         {
+            UserModel newUser = new UserModel();
             await jwtService.DestroyTokenAsync();
-            state.UpdateUser(new UserModel());
+
+            if (state?.User != newUser)
+                state.UpdateUser(newUser);
         }
 
         public async Task SignOutAsync()
