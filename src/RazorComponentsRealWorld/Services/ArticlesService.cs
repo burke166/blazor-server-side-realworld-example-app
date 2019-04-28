@@ -51,6 +51,16 @@ namespace RazorComponentsRealWorld.Services
             });
         }
 
+        public async Task<ApiResponse<ArticlesResponse>> GetFavoritedAsync(string user, int offset = 0)
+        {
+            return await QueryAsync(new Dictionary<string, string>
+            {
+                { "favorited", user },
+                { "limit", "10" },
+                { "offset", offset.ToString() }
+            });
+        }
+
         public async Task<ApiResponse<ArticlesResponse>> GetByTagAsync(string tag, int offset = 0)
         {
             return await QueryAsync(new Dictionary<string, string>
