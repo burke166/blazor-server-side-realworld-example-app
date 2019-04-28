@@ -49,28 +49,29 @@ namespace RazorComponentsRealWorld.Services
             });
         }
 
-        public async Task<bool> DeleteAsync(string Slug)
+        public async Task<bool> DeleteAsync(string slug)
         {
-            ApiResponse<ArticleModel> response = await api.DeleteAsync<ArticleModel>($"/articles/{Slug}");
+            ApiResponse<ArticleModel> response = await api.DeleteAsync<ArticleModel>($"/articles/{slug}");
             return response?.HasSuccessStatusCode ?? false;
         }
 
-        public async Task<ApiResponse<ArticleResponse>> SaveAsync(ArticleModel Value, string Slug = "")
+        public async Task<ApiResponse<ArticleResponse>> SaveAsync(ArticleModel value)
         {
+            string slug = value?.Slug ?? string.Empty;
             ApiResponse<ArticleResponse> response = null;
 
-            if (string.IsNullOrWhiteSpace(Slug))
+            if (string.IsNullOrWhiteSpace(slug))
             {
                 response = await api.PostAsync<ArticleResponse>($"/articles/", new
                 {
-                    article = Value
+                    article = value
                 });
             }
             else
             {
-                response = await api.PutAsync<ArticleResponse>($"/articles/{Slug}", new
+                response = await api.PutAsync<ArticleResponse>($"/articles/{slug}", new
                 {
-                    article = Value
+                    article = value
                 });
             }
 
