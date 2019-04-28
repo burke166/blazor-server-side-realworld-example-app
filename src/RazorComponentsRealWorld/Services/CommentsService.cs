@@ -12,42 +12,45 @@ namespace RazorComponentsRealWorld.Services
             api = _api;
         }
 
-        public async Task<ApiResponse<CommentResponse>> AddAsync(string Slug, CommentModel Comment)
+        public async Task<ApiResponse<CommentResponse>> AddAsync(string slug, CommentModel value)
         {
-            var response = await api.PostAsync<CommentResponse>($"/articles/{Slug}/comments", Comment);
+            var response = await api.PostAsync<CommentResponse>($"/articles/{slug}/comments", new
+            {
+                comment = value
+            });
             return response;
         }
 
-        public async Task<ApiResponse<CommentResponse>> AddAsync(ArticleModel Article, CommentModel Comment)
+        public async Task<ApiResponse<CommentResponse>> AddAsync(ArticleModel article, CommentModel value)
         {
-            return await AddAsync(Article.Slug, Comment);
+            return await AddAsync(article.Slug, value);
         }
 
-        public async Task<ApiResponse<CommentsResponse>> GetAllAsync(string Slug)
+        public async Task<ApiResponse<CommentsResponse>> GetAllAsync(string slug)
         {
-            var response = await api.GetAsync<CommentsResponse>($"/articles/{Slug}/comments");
+            var response = await api.GetAsync<CommentsResponse>($"/articles/{slug}/comments");
             return response;
         }
 
-        public async Task<bool> DeleteAsync(string Slug, int CommentId)
+        public async Task<bool> DeleteAsync(string slug, int commentId)
         {
-            var response = await api.DeleteAsync<CommentModel>($"/articles/{Slug}/comments/{CommentId.ToString()}");
+            var response = await api.DeleteAsync<CommentModel>($"/articles/{slug}/comments/{commentId.ToString()}");
             return response?.HasSuccessStatusCode ?? false;
         }
 
-        public async Task<bool> DeleteAsync(string Slug, CommentModel Comment)
+        public async Task<bool> DeleteAsync(string slug, CommentModel comment)
         {
-            return await DeleteAsync(Slug, Comment.Id);
+            return await DeleteAsync(slug, comment.Id);
         }
 
-        public async Task<bool> DeleteAsync(ArticleModel Article, CommentModel Comment)
+        public async Task<bool> DeleteAsync(ArticleModel article, CommentModel comment)
         {
-            return await DeleteAsync(Article.Slug, Comment.Id);
+            return await DeleteAsync(article.Slug, comment.Id);
         }
 
-        public async Task<bool> DeleteAsync(ArticleModel Article, int CommentId)
+        public async Task<bool> DeleteAsync(ArticleModel article, int commentId)
         {
-            return await DeleteAsync(Article.Slug, CommentId);
+            return await DeleteAsync(article.Slug, commentId);
         }
     }
 

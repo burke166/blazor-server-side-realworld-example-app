@@ -35,7 +35,7 @@ namespace RazorComponentsRealWorld.Services
         public async Task<ApiResponse<T>> GetAsync<T>(string Path, IDictionary<string, string> Params = null)
         {
             HttpResponseMessage response = await httpClient.GetAsync(BuildUri(Path, Params));
-
+            
             return await ApiResponse<T>.CreateAsync(response);
         }
 
@@ -62,9 +62,7 @@ namespace RazorComponentsRealWorld.Services
             StringContent content = new StringContent(valueString, System.Text.Encoding.UTF8, "application/json");
 
             HttpResponseMessage response = await httpClient.PostAsync(BuildUri(Path, Params), content);
-
-            await console.LogAsync(await response.Content.ReadAsStringAsync()); 
-
+            
             return await ApiResponse<T>.CreateAsync(response);
         }
 

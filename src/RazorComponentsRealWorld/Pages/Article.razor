@@ -23,31 +23,33 @@
                 </div>
                 @if (article.Author.Username == state.User.Username)
                 {
-                    <a class="btn btn-outline-secondary btn-sm" href="/editor/@Slug">
-                        <i class="ion-edit"></i>
-                        &nbsp;
-                        Edit Article
-                    </a>
-                    <text>&nbsp; &nbsp;</text>
-                    <button class="btn btn-outline-danger btn-sm" onclick="@DeleteArticle">
-                        <i class="ion-trash-a"></i>
-                        &nbsp;
-                        Delete Article
-                    </button>
+                <a class="btn btn-outline-secondary btn-sm" href="/editor/@Slug">
+                    <i class="ion-edit"></i>
+                    &nbsp;
+                    Edit Article
+                </a>
+                <text>&nbsp; &nbsp;</text>
+                <button class="btn btn-outline-danger btn-sm" onclick="@DeleteArticle">
+                    <i class="ion-trash-a"></i>
+                    &nbsp;
+                    Delete Article
+                </button>
                 }
                 else
                 {
-                    <button class="btn btn-sm btn-outline-secondary">
-                        <i class="ion-plus-round"></i>
-                        &nbsp;
-                        Follow @article.Author.Username <span class="counter">(10)</span>
-                    </button>
-                    <text>&nbsp; &nbsp;</text>
-                    <button class="btn btn-sm btn-outline-primary">
-                        <i class="ion-heart"></i>
-                        &nbsp;
-                        Favorite Post <span class="counter">(@article.FavoritesCount)</span>
-                    </button>
+                <button class="@(article.Author.Following ? "btn btn-sm btn-secondary" : "btn btn-sm btn-outline-secondary")" type="button" onclick="@Follow">
+                    <i class="ion-plus-round"></i>
+                    &nbsp;
+                    @(article.Author.Following ? "Unfollow" : "Follow")
+                    @article.Author.Username
+                </button>
+                <text>&nbsp; &nbsp;</text>
+                <button class="@(article.Favorited ? "btn btn-sm btn-primary" : "btn btn-sm btn-outline-primary")" type="button" onclick="@Favorite">
+                    <i class="ion-heart"></i>
+                    &nbsp;
+                    @(article.Favorited ? "Unfavorite" : "Favorite")
+                    Post <span class="ifunter">(@article.FavoritesCount)</span>
+                </button>
                 }
             </div>
 
@@ -72,16 +74,18 @@
                     <span class="date">@article.CreatedAt.ToLongDateString()</span>
                 </div>
 
-                <button class="btn btn-sm btn-outline-secondary">
+                <button class="@(article.Author.Following ? "btn btn-sm btn-secondary" : "btn btn-sm btn-outline-secondary")" type="button" onclick="@Follow">
                     <i class="ion-plus-round"></i>
                     &nbsp;
-                    Follow @article.Author.Username <span class="counter">(10)</span>
+                    @(article.Author.Following ? "Unfollow" : "Follow")
+                    @article.Author.Username
                 </button>
                 &nbsp;
-                <button class="btn btn-sm btn-outline-primary">
+                <button class="@(article.Favorited ? "btn btn-sm btn-primary" : "btn btn-sm btn-outline-primary")" type="button" onclick="@Favorite">
                     <i class="ion-heart"></i>
                     &nbsp;
-                    Favorite Post <span class="counter">(@article.FavoritesCount)</span>
+                    @(article.Favorited ? "Unfavorite" : "Favorite")
+                    Post <span class="ifunter">(@article.FavoritesCount)</span>
                 </button>
             </div>
         </div>
@@ -90,15 +94,17 @@
 
             <div class="col-xs-12 col-md-8 offset-md-2">
 
+                <ErrorMessages Errors=@errors />
+
                 @if (state.IsSignedIn)
                 {
                     <form class="card comment-form">
                         <div class="card-block">
-                            <textarea class="form-control" placeholder="Write a comment..." rows="3"></textarea>
+                            <textarea class="form-control" placeholder="Write a comment..." rows="3" bind="@newComment.Body">@newComment.Body</textarea>
                         </div>
                         <div class="card-footer">
                             <img src="@state.User.Image" class="comment-author-img" />
-                            <button class="btn btn-sm btn-primary">
+                            <button class="btn btn-sm btn-primary" type="button" onclick="@Submit">
                                 Post Comment
                             </button>
                         </div>
@@ -142,7 +148,9 @@
     public string Slug { get; set; }
 
     ArticleModel article = null;
-    CommentModel[] comments = null;
+    CommentModel newComment = new CommentModel();
+    List<CommentModel> comments = null;
+    ErrorsModel errors = new ErrorsModel();
 
     protected override async Task OnInitAsync()
     {
@@ -158,9 +166,9 @@
     public void Dispose()
     {
         state.OnUserChange -= Update;
-    }    
+    }
 
-    void Update()
+    private void Update()
     {
         StateHasChanged();
     }
@@ -188,7 +196,7 @@
     {
         if (response != null && response.HasSuccessStatusCode)
         {
-            comments = response.Value?.Comments.ToArray();
+            comments = response.Value?.Comments.ToList();
         }
         else
         {
@@ -207,5 +215,67 @@
     {
         await articlesApi.DeleteAsync(Slug);
         uriHelper.NavigateTo("/");
+    }
+
+    async Task Favorite()
+    {
+        bool response = article.Favorited ? await articlesApi.UnfavoriteAsync(article.Slug) : await articlesApi.FavoriteAsync(article.Slug);
+
+        if (response)
+        {
+            if (article.Favorited)
+            {
+                article.FavoritesCount--;
+            }
+            else
+            {
+                article.FavoritesCount++;
+            }
+            article.Favorited = !article.Favorited;
+        }
+    }
+
+    async Task Follow()
+    {
+        bool response = article.Author.Following ? await articlesApi.UnfavoriteAsync(article.Author.Username) : await articlesApi.FavoriteAsync(article.Author.Username);
+
+        if (response)
+        {
+            article.Author.Following = !article.Author.Following;
+        }
+    }
+
+    async Task Submit()
+    {
+        var response = await commentsApi.AddAsync(article.Slug, newComment);
+
+        if (response != null && response.HasSuccessStatusCode)
+        {
+            var postedComment = response.Value?.Comment;
+            if (postedComment != null)
+            {
+                List<CommentModel> updatedCommentList = new List<CommentModel>();
+                updatedCommentList.Add(postedComment);
+                updatedCommentList.AddRange(comments);
+                comments = updatedCommentList;
+                newComment = new CommentModel();
+            }
+        }
+        else
+        {
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+            {
+                uriHelper.NavigateTo("/signin");
+            }
+
+            if (response.Errors != null)
+            {
+                errors = response.Errors;
+            }
+        }
     }
 }

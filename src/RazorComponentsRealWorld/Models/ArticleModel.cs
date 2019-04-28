@@ -17,6 +17,7 @@ namespace RazorComponentsRealWorld.Models
         public string Description { get; set; }
         public AuthorModel Author { get; set; }
         public int FavoritesCount { get; set; }
+        public bool Favorited { get; set; }
     }
 
     public class AuthorModel
@@ -49,5 +50,9 @@ namespace RazorComponentsRealWorld.Models
                 image = value;
             }
         }
+
+        public string Bio { get; set; }
+
+        public bool Following { get; set; }
     }
 }

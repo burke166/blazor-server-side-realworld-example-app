@@ -17,14 +17,16 @@ namespace RazorComponentsRealWorld.Services
             return await api.GetAsync<ProfileResponse>($"/profiles/{username}");
         }
 
-        public async Task<ApiResponse<ProfileResponse>> FollowAsync(string username)
+        public async Task<bool> FollowAsync(string username)
         {
-            return await api.PostAsync<ProfileResponse>($"/profiles/{username}/follow", null);
+            var response = await api.PostAsync<ProfileResponse>($"/profiles/{username}/follow");
+            return response?.HasSuccessStatusCode ?? false;
         }
 
-        public async Task<ApiResponse<ProfileResponse>> UnfollowAsync(string username)
+        public async Task<bool> UnfollowAsync(string username)
         {
-            return await api.PostAsync<ProfileResponse>($"/profiles/{username}/follow", null);
+            var response = await api.DeleteAsync<ProfileResponse>($"/profiles/{username}/follow");
+            return response?.HasSuccessStatusCode ?? false;
         }
 
     }
