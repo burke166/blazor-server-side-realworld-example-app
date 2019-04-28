@@ -39,8 +39,9 @@ namespace RazorComponentsRealWorld.Services
             return await ApiResponse<T>.CreateAsync(response);
         }
 
-        public async Task<ApiResponse<T>> PutAsync<T>(string Path, IDictionary<string, string> Params, object Value)
+        public async Task<ApiResponse<T>> PutAsync<T>(string Path, IDictionary<string, string> Params, object Value = null)
         {
+            if (Value == null) Value = string.Empty;
             string valueString = JsonConvert.SerializeObject(Value);
             StringContent content = new StringContent(valueString, System.Text.Encoding.UTF8, "application/json");
 
@@ -49,13 +50,14 @@ namespace RazorComponentsRealWorld.Services
             return await ApiResponse<T>.CreateAsync(response);
         }
 
-        public async Task<ApiResponse<T>> PutAsync<T>(string Path, object Value)
+        public async Task<ApiResponse<T>> PutAsync<T>(string Path, object Value = null)
         {
             return await PutAsync<T>(Path, null, Value);
         }
 
-        public async Task<ApiResponse<T>> PostAsync<T>(string Path, IDictionary<string, string> Params, object Value)
+        public async Task<ApiResponse<T>> PostAsync<T>(string Path, IDictionary<string, string> Params, object Value = null)
         {
+            if (Value == null) Value = string.Empty;
             string valueString = JsonConvert.SerializeObject(Value);
             StringContent content = new StringContent(valueString, System.Text.Encoding.UTF8, "application/json");
 
@@ -66,7 +68,7 @@ namespace RazorComponentsRealWorld.Services
             return await ApiResponse<T>.CreateAsync(response);
         }
 
-        public async Task<ApiResponse<T>> PostAsync<T>(string Path, object Value)
+        public async Task<ApiResponse<T>> PostAsync<T>(string Path, object Value = null)
         {
             return await PostAsync<T>(Path, null, Value);
         }

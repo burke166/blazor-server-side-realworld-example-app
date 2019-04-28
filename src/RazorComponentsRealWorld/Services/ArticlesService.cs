@@ -61,11 +61,17 @@ namespace RazorComponentsRealWorld.Services
 
             if (string.IsNullOrWhiteSpace(Slug))
             {
-                response = await api.PostAsync<ArticleResponse>($"/articles/", Value);
+                response = await api.PostAsync<ArticleResponse>($"/articles/", new
+                {
+                    article = Value
+                });
             }
             else
             {
-                response = await api.PutAsync<ArticleResponse>($"/articles/{Slug}", Value);
+                response = await api.PutAsync<ArticleResponse>($"/articles/{Slug}", new
+                {
+                    article = Value
+                });
             }
 
             return response;
@@ -73,7 +79,7 @@ namespace RazorComponentsRealWorld.Services
 
         public async Task<bool> FavoriteAsync(string Slug)
         {
-            ApiResponse<ArticleModel> response = await api.PostAsync<ArticleModel>($"/articles/{Slug}/favorite", new ArticleModel());
+            ApiResponse<ArticleModel> response = await api.PostAsync<ArticleModel>($"/articles/{Slug}/favorite");
             return response?.HasSuccessStatusCode ?? false;
         }
 
