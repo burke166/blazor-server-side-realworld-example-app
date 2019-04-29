@@ -14,17 +14,17 @@ namespace RazorComponentsRealWorld.Services
 
         public async Task<string> GetTokenAsync()
         {
-            return await jsRuntime.InvokeAsync<string>("Realworld.getToken");
+            return await jsRuntime.InvokeAsync<string>("RealWorld.getToken");
         }
 
         public async Task<bool> SaveTokenAsync(string Token)
         {
-            return await jsRuntime.InvokeAsync<bool>("Realworld.saveToken", Token);
+            return await jsRuntime.InvokeAsync<bool>("RealWorld.saveToken", Token);
         }
 
         public async Task<bool> DestroyTokenAsync()
         {
-            return await jsRuntime.InvokeAsync<bool>("Realworld.destroyToken");
+            return await jsRuntime.InvokeAsync<bool>("RealWorld.destroyToken");
         }
     }
 }

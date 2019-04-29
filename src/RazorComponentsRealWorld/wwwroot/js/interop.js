@@ -1,4 +1,4 @@
-﻿window.Realworld = {
+﻿window.RealWorld = {
     saveToken: function (token) {
         window.localStorage.setItem('jwt', token);
         console.log("Authentication token has been stored.");
@@ -16,6 +16,10 @@
     },
     consoleLog: function (message) {
         console.log(message);
+        return true;
+    },
+    scrollToTop: function () {
+        window.scrollTo(0, 0);
         return true;
     }
 };

@@ -7,6 +7,7 @@
 @inject TagsService tagsApi
 @inject UserService userApi
 @inject StateService state
+@inject IJSRuntime js
 
     <div class="home-page">
         @if (!state.IsSignedIn)
@@ -63,24 +64,24 @@
     </div>
 
 @functions {
-    IEnumerable<ArticleModel> articles;
-    IEnumerable<string> tags;
-    int articlesCount;
-    int currentPage = 1;
-    SelectedTab selectedTab;
-    string selectedTag;
+        IEnumerable<ArticleModel> articles;
+        IEnumerable<string> tags;
+        int articlesCount;
+        int currentPage = 1;
+        SelectedTab selectedTab;
+        string selectedTag;
 
-    string FeedState
+        string FeedState
     {
-        get
+            get
         {
-            if (!state.IsSignedIn) { return "disabled" ; }
-            if (selectedTab == SelectedTab.Feed) { return "active"; }
-            return "";
+                if (!state.IsSignedIn) { return "disabled" ; }
+                if (selectedTab == SelectedTab.Feed) { return "active"; }
+                return "";
+            }
         }
-    }
 
-    string GlobalState => selectedTab == SelectedTab.Global ? "active" : "";
+        string GlobalState => selectedTab == SelectedTab.Global ? "active" : "";
 
     protected override async Task OnInitAsync()
     {
@@ -99,12 +100,16 @@
         StateHasChanged();
     }
 
-    void DisplayResponse(ApiResponse<ArticlesResponse> response)
+    async Task DisplayResponseAsync(ApiResponse<ArticlesResponse> response, bool scrollToTop)
     {
         if (response != null && response.HasSuccessStatusCode)
         {
             articles = response.Value?.Articles;
             articlesCount = response.Value?.ArticlesCount ?? 0;
+            if (scrollToTop)
+            {
+                await js.InvokeAsync<bool>("RealWorld.scrollToTop");
+            }
         }
         else
         {
@@ -123,14 +128,14 @@
     {
         selectedTab = SelectedTab.Feed;
         var response = await articlesApi.GetFeedAsync(0);
-        DisplayResponse(response);
+        await DisplayResponseAsync(response, false);
     }
 
     async Task GlobalFeedAsync()
     {
         selectedTab = SelectedTab.Global;
         var response = await articlesApi.GetArticlesAsync(0);
-        DisplayResponse(response);
+        await DisplayResponseAsync(response, false);
     }
 
     async Task SelectTag(string tag)
@@ -138,7 +143,7 @@
         selectedTab = SelectedTab.Tag;
         selectedTag = tag;
         var response = await articlesApi.GetByTagAsync(tag, 0);
-        DisplayResponse(response);
+        await DisplayResponseAsync(response, false);
     }
 
     async Task SetPage(int page)
@@ -159,7 +164,7 @@
         {
             response = await articlesApi.GetArticlesAsync(offset);
         }
-        DisplayResponse(response);
+        await DisplayResponseAsync(response, true);
     }
 
     enum SelectedTab

@@ -5,6 +5,7 @@
 @inject ArticlesService articlesApi
 @inject StateService state
 @inject IUriHelper uriHelper
+@inject IJSRuntime js
 
 <div class="profile-page">
     <div class="user-info">
@@ -18,18 +19,18 @@
                     </p>
                     @if (Username != state.User.Username)
                     {
-                        <button class="@(profile.following ? "btn btn-sm btn-secondary action-btn" : "btn btn-sm btn-outline-secondary action-btn")" type="button" onclick="@Follow">
-                            <i class="ion-plus-round"></i>
-                            &nbsp;
-                            @(profile.following ? "Unfollow" : "Follow")
-                            @Username
-                        </button>
+                    <button class="@(profile.following ? "btn btn-sm btn-secondary action-btn" : "btn btn-sm btn-outline-secondary action-btn")" type="button" onclick="@Follow">
+                        <i class="ion-plus-round"></i>
+                        &nbsp;
+                        @(profile.following ? "Unfollow" : "Follow")
+                        @Username
+                    </button>
                     }
                     else
                     {
-                        <NavLink class="btn btn-sm btn-outline-secondary action-btn" href="/settings">
-                            <i class="ion-gear-a"></i>&nbsp;Edit Profile Settings
-                        </NavLink>
+                    <NavLink class="btn btn-sm btn-outline-secondary action-btn" href="/settings">
+                        <i class="ion-gear-a"></i>&nbsp;Edit Profile Settings
+                    </NavLink>
                     }
                 </div>
             </div>
@@ -97,12 +98,16 @@
         }
     }
 
-    void DisplayResponse(ApiResponse<ArticlesResponse> response)
+    async Task DisplayResponseAsync(ApiResponse<ArticlesResponse> response, bool scrollToTop)
     {
         if (response != null && response.HasSuccessStatusCode)
         {
             articles = response.Value?.Articles;
             articlesCount = response.Value?.ArticlesCount ?? 0;
+            if (scrollToTop)
+            {
+                await js.InvokeAsync<bool>("RealWorld.scrollToTop");
+            }
         }
         else
         {
@@ -120,13 +125,13 @@
     private async Task DisplayArticlesAsync()
     {
         var response = await articlesApi.GetByAuthorAsync(Username);
-        DisplayResponse(response);
+        await DisplayResponseAsync(response, false);
     }
 
     private async Task DisplayFavoritesAsync()
     {
         var response = await articlesApi.GetFavoritedAsync(Username);
-        DisplayResponse(response);
+        await DisplayResponseAsync(response, false);
     }
 
     async Task SetPage(int page)
@@ -143,7 +148,7 @@
         {
             response = await articlesApi.GetFavoritedAsync(Username, offset);
         }
-        DisplayResponse(response);
+        await DisplayResponseAsync(response, true);
     }
 
     async Task Follow()
