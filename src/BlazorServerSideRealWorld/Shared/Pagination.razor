@@ -14,19 +14,19 @@
 
 @functions {
     [Parameter]
-    private int TotalArticles { get; set; }
+    public int TotalArticles { get; set; }
 
     [Parameter]
-    private int PageSize { get; set; }
+    public int PageSize { get; set; }
 
     [Parameter]
-    private int CurrentPage { get; set; }
+    public int CurrentPage { get; set; }
 
     [Parameter]
-    private EventCallback<int> CurrentPageChanged { get; set; }
+    public EventCallback<int> CurrentPageChanged { get; set; }
 
     [Parameter]
-    private EventCallback<int> OnPageClicked { get; set; }
+    public EventCallback<int> OnPageClicked { get; set; }
         
     private async Task ChangePageAsync(int page)
     {

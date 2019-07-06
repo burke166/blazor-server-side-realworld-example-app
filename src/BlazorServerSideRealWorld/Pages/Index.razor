@@ -39,7 +39,7 @@
                         </ul>
                     </div>
                     <ArticleList Articles=@articles />
-                    <Pagination TotalArticles=@articlesCount PageSize="10" bind-CurrentPage=@currentPage OnPageClicked="@(e => SetPage(e))" />
+                    <Pagination TotalArticles=@articlesCount PageSize="10" CurrentPage=@currentPage OnPageClicked="@(e => SetPage(e))" />
                 </div>
                 <div class="col-md-3">
                     <div class="sidebar">
