@@ -4,15 +4,15 @@
 
 @if (Articles == null)
 {
-<div class="article-preview">
-    Loading articles...
-</div>
+    <div class="article-preview">
+        Loading articles...
+    </div>
 }
 else if (Articles.Count() == 0)
 {
-<div class="article-preview">
-    No articles here... yet.
-</div>
+    <div class="article-preview">
+        No articles here... yet.
+    </div>
 }
 else
 {
@@ -27,7 +27,7 @@ else
                     <a href="/profile/@article.Author.Username" class="author">@article.Author.Username</a>
                     <span class="date">@String.Format("{0:MMMM} {1}", date, Ordinal(date.Day))</span>
                 </div>
-                <button class="@(article.Favorited ? "btn btn-sm btn-primary pull-xs-right" : "btn btn-sm btn-outline-primary pull-xs-right")" type="button" onclick="@(e => Favorite(article))">
+                <button class="@(article.Favorited ? "btn btn-sm btn-primary pull-xs-right" : "btn btn-sm btn-outline-primary pull-xs-right")" type="button" @onclick="@(e => Favorite(article))">
                     <i class="ion-heart"></i> @article.FavoritesCount
                 </button>
             </div>
@@ -41,8 +41,9 @@ else
 }
 
 @functions {
+
     [Parameter]
-    IEnumerable<ArticleModel> Articles { get; set; }
+    public IEnumerable<ArticleModel> Articles { get; set; }
 
     async Task Favorite(ArticleModel article)
     {

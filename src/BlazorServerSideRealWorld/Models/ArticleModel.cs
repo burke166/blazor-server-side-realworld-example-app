@@ -25,7 +25,8 @@ namespace BlazorServerSideRealWorld.Models
         public string Username { get; set; }
 
         private string image;
-        public string Image {
+        public string Image
+        {
             get
             {
                 if (string.IsNullOrWhiteSpace(image)) return string.Empty;
